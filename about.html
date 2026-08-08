@@ -64,11 +64,13 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
 .nav .brand{gap:13px;font-size:17px}
 .nav .brand-mark{height:25px}
 .nav-links{display:flex;gap:34px;font-size:15px;color:var(--dust);font-weight:400}
-.nav-links a{position:relative;padding:4px 0;transition:color .3s}
+.nav-links a,.nav-links .nav-soon{position:relative;padding:4px 0;transition:color .3s}
 .nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;
   background:var(--oxide);transition:width .35s var(--ease)}
 .nav-links a:hover{color:var(--bone)}
 .nav-links a:hover::after{width:100%}
+/* 페이지 준비 전 항목 */
+.nav-soon{cursor:default;opacity:.62}
 .nav-links a.active{color:var(--bone)}
 .nav-links a.active::after{width:100%}
 .nav-right{display:flex;align-items:center;gap:20px}
@@ -249,12 +251,12 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
     AIBOX
   </a>
   <div class="nav-links">
-    <a href="#vision" class="active">회사소개</a>
-    <a href="index.html#descent">기술</a>
-    <a href="index.html#products">제품</a>
-    <a href="index.html#business">사업영역</a>
-    <a href="index.html#global">글로벌</a>
-    <a href="index.html#cta">채용</a>
+    <a href="about.html" class="active">회사소개</a>
+    <span class="nav-soon">기술</span>
+    <span class="nav-soon">제품</span>
+    <span class="nav-soon">사업영역</span>
+    <span class="nav-soon">글로벌</span>
+    <span class="nav-soon">채용</span>
   </div>
   <div class="nav-right">
     <div class="lang" id="lang">

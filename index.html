@@ -143,11 +143,13 @@ body::after{
 .nav .brand-mark{height:25px}
 
 .nav-links{display:flex;gap:34px;font-size:15px;color:var(--dust);font-weight:400}
-.nav-links a{position:relative;padding:4px 0;transition:color .3s}
+.nav-links a,.nav-links .nav-soon{position:relative;padding:4px 0;transition:color .3s}
 .nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;
   background:var(--oxide);transition:width .35s var(--ease)}
 .nav-links a:hover{color:var(--bone)}
 .nav-links a:hover::after{width:100%}
+/* 페이지 준비 전 항목 — 링크처럼 보이지 않게 커서와 대비를 낮춘다 */
+.nav-soon{cursor:default;opacity:.62}
 
 .nav-right{display:flex;align-items:center;gap:20px}
 .lang{position:relative;font-family:var(--f-mono);font-size:12.5px;letter-spacing:.14em}
@@ -648,6 +650,51 @@ body::after{
   font-weight:300;letter-spacing:-.03em;color:var(--bone)}
 .gstat span{display:block;margin-top:8px;font-size:13px;color:var(--dust)}
 
+/* =====================  SHORTS (농사천국)  ===================== */
+.shorts{padding:clamp(90px,13vh,150px) var(--pad);background:var(--void);
+  border-top:1px solid var(--seam)}
+.shorts-wrap{max-width:1320px;margin:0 auto}
+.shorts-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+  gap:24px;margin-bottom:clamp(34px,5vh,54px)}
+.shorts-head .h-section{margin-top:18px;max-width:20ch}
+.shorts-links{display:flex;flex-wrap:wrap;gap:12px}
+.shorts-link{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-mono);
+  font-size:13px;letter-spacing:.08em;color:var(--dust);
+  border:1px solid var(--seam);border-radius:2px;padding:10px 16px;transition:.35s var(--ease)}
+.shorts-link:hover{color:var(--bone);border-color:var(--dust)}
+.shorts-link.is-yt:hover{color:#FF4E45;border-color:rgba(255,78,69,.5)}
+
+.shorts-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(12px,1.4vw,20px)}
+.short{display:block;min-width:0}
+.short-thumb{position:relative;aspect-ratio:9/16;overflow:hidden;border-radius:3px;
+  background:var(--strata);border:1px solid var(--seam)}
+.short-thumb img{width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.01);filter:saturate(.94) brightness(.92);
+  transition:transform .7s var(--ease),filter .5s var(--ease)}
+.short:hover .short-thumb img{transform:scale(1.07);filter:saturate(1) brightness(1)}
+.short-thumb::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 52%,rgba(10,11,13,.62) 100%)}
+.short-play{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;
+  z-index:2;border-radius:50%;background:rgba(10,11,13,.52);backdrop-filter:blur(3px);
+  border:1px solid rgba(233,230,223,.34);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.82);transition:.42s var(--ease)}
+.short:hover .short-play{opacity:1;transform:scale(1)}
+.short-play::before{content:"";width:0;height:0;margin-left:3px;
+  border-left:12px solid var(--bone);border-top:7.5px solid transparent;border-bottom:7.5px solid transparent}
+.short-badge{position:absolute;left:10px;top:10px;z-index:2;font-family:var(--f-mono);
+  font-size:10px;letter-spacing:.14em;color:var(--bone);
+  background:rgba(10,11,13,.6);border:1px solid rgba(233,230,223,.2);
+  padding:4px 8px;border-radius:2px}
+.short-title{margin-top:13px;font-size:14px;line-height:1.55;color:var(--dust);
+  word-break:keep-all;transition:color .3s;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.short:hover .short-title{color:var(--bone)}
+@media(max-width:1000px){.shorts-grid{grid-template-columns:repeat(3,1fr)}
+  .short:nth-child(n+4){display:none}}
+@media(max-width:620px){.shorts-grid{grid-template-columns:repeat(2,1fr)}
+  .short:nth-child(n+3){display:none}}
+
 /* =====================  CTA  ===================== */
 .cta{padding:clamp(110px,16vh,180px) var(--pad) clamp(90px,12vh,140px);
   background:var(--void);border-top:1px solid var(--seam)}
@@ -721,13 +768,14 @@ body::after{
     <svg class="brand-mark" viewBox="0 0 1530 611" aria-label="AIBOX"><use href="#abxMark"/></svg>
     AIBOX
   </a>
+  <!-- 항목별 페이지가 준비되면 href를 채운다. 그전까지는 본문 스크롤로 보내지 않는다 -->
   <div class="nav-links">
     <a href="about.html">회사소개</a>
-    <a href="#descent">기술</a>
-    <a href="#products">제품</a>
-    <a href="#business">사업영역</a>
-    <a href="#global">글로벌</a>
-    <a href="#cta">채용</a>
+    <span class="nav-soon">기술</span>
+    <span class="nav-soon">제품</span>
+    <span class="nav-soon">사업영역</span>
+    <span class="nav-soon">글로벌</span>
+    <span class="nav-soon">채용</span>
   </div>
   <div class="nav-right">
     <div class="lang" id="lang">
@@ -1488,6 +1536,61 @@ body::after{
       <div class="gstat rv rv-d2"><b>KOR / ENG / JPN / AR</b><span>4개 언어 대응 예정</span></div>
       <div class="gstat rv rv-d3"><b>노지 · 시설 · 과수</b><span>토양 조건 무관 적용</span></div>
       <div class="gstat rv rv-d4"><b>참외 · 딸기</b><span>고부가 과채류 실증 작물</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SHORTS · 농사천국 ========== -->
+<section class="shorts" id="shorts">
+  <div class="shorts-wrap">
+    <div class="shorts-head">
+      <div>
+        <div class="eyebrow rv">Field Notes</div>
+        <h2 class="h-section rv rv-d1">현장의 질문에<br>영상으로 답합니다</h2>
+      </div>
+      <div class="shorts-links rv rv-d2">
+        <a class="shorts-link is-yt" href="https://www.youtube.com/@AgroIdeaBox/shorts"
+           target="_blank" rel="noopener">유튜브 채널 →</a>
+        <a class="shorts-link" href="https://nong1000.co.kr/" target="_blank" rel="noopener">농사천국 →</a>
+      </div>
+    </div>
+
+    <div class="shorts-grid">
+      <a class="short rv" href="https://youtube.com/shorts/uHXHs1jgD6Q" target="_blank" rel="noopener">
+        <div class="short-thumb">
+          <span class="short-badge">Shorts</span><span class="short-play"></span>
+          <img src="short-1.jpg" alt="" loading="lazy" decoding="async" width="440" height="782">
+        </div>
+        <div class="short-title">아크로마이트 효능과 사용법｜수확 후 밑거름 준비</div>
+      </a>
+      <a class="short rv rv-d1" href="https://youtube.com/shorts/M_vyFPA6Rwg" target="_blank" rel="noopener">
+        <div class="short-thumb">
+          <span class="short-badge">Shorts</span><span class="short-play"></span>
+          <img src="short-2.jpg" alt="" loading="lazy" decoding="async" width="440" height="782">
+        </div>
+        <div class="short-title">황산가리, 많이 준다고 당도가 올라갈까? 효능부터 사용법까지</div>
+      </a>
+      <a class="short rv rv-d2" href="https://youtube.com/shorts/Op9uadHtEKc" target="_blank" rel="noopener">
+        <div class="short-thumb">
+          <span class="short-badge">Shorts</span><span class="short-play"></span>
+          <img src="short-3.jpg" alt="" loading="lazy" decoding="async" width="440" height="782">
+        </div>
+        <div class="short-title">칼륨 비료, 아직도 양으로만 선택하시나요?</div>
+      </a>
+      <a class="short rv rv-d3" href="https://youtube.com/shorts/N8Bpg03vIdQ" target="_blank" rel="noopener">
+        <div class="short-thumb">
+          <span class="short-badge">Shorts</span><span class="short-play"></span>
+          <img src="short-4.jpg" alt="" loading="lazy" decoding="async" width="440" height="782">
+        </div>
+        <div class="short-title">장마 시작! 소중한 작물 살리는 필수 관리법</div>
+      </a>
+      <a class="short rv rv-d4" href="https://youtube.com/shorts/E9AJz-EOW9U" target="_blank" rel="noopener">
+        <div class="short-thumb">
+          <span class="short-badge">Shorts</span><span class="short-play"></span>
+          <img src="short-5.jpg" alt="" loading="lazy" decoding="async" width="440" height="782">
+        </div>
+        <div class="short-title">질소 가득한 축분 퇴비 끊고, 토양 EC 0.5 이하로 맞추는 법</div>
+      </a>
     </div>
   </div>
 </section>
