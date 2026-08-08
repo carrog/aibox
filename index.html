@@ -24,7 +24,9 @@
   --verdigris: #4E8C7D;   /* accent 2 — 구리 녹청 */
 
   --f-sans: "IBM Plex Sans KR","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  --f-mono: "IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+  /* 라틴은 Plex Mono가 받고, 한글은 Plex Mono에 없으므로 Plex Sans KR로 떨어진다.
+     이 항목이 없으면 한글이 generic monospace(시스템 기본)로 넘어가 뭉개진다. */
+  --f-mono: "IBM Plex Mono","SFMono-Regular",Consolas,"IBM Plex Sans KR","Malgun Gothic",monospace;
 
   --pad: clamp(20px, 5vw, 80px);
   --ease: cubic-bezier(.22,.61,.36,1);
@@ -51,8 +53,8 @@ body::after{
 
 /* ---------- 공통 타이포 유틸 ---------- */
 .eyebrow{
-  font-family:var(--f-mono);font-size:11px;font-weight:500;
-  letter-spacing:.22em;text-transform:uppercase;color:var(--oxide);
+  font-family:var(--f-mono);font-size:13px;font-weight:500;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--oxide);
   display:flex;align-items:center;gap:12px;
 }
 .eyebrow::before{content:"";width:28px;height:1px;background:var(--oxide);flex:none}
@@ -187,17 +189,19 @@ body::after{
 .amb.has-video .leaf-drawn{opacity:0}
 /* ▼ 사진 슬롯: 로드되면 라인아트가 물러나고 사진이 앰비언트가 됨 */
 .amb-photo{position:absolute;inset:0;z-index:1;display:block;will-change:transform;
-  animation:heroPan 36s ease-in-out infinite alternate}
+  transform:scale(1.04)}
+/* 슬라이드는 6.4초만 머문다. 그 안에 움직임이 읽히도록 .on이 붙는 순간부터 재생한다 */
+.amb.on .amb-photo{animation:heroPan 13s ease-in-out infinite alternate}
 .amb-photo img{width:100%;height:100%;object-fit:cover;object-position:54% 46%;
   opacity:.74;filter:saturate(.86) contrast(1.05) brightness(.88)}
 /* 슬라이드 03 — 반대 방향으로 더 느리게 흘러 두 사진이 같은 움직임으로 보이지 않게 */
-.amb-photo--slow{animation:heroPanAlt 46s ease-in-out infinite alternate}
+.amb.on .amb-photo--slow{animation:heroPanAlt 16s ease-in-out infinite alternate}
 .amb-photo--slow img{object-position:50% 58%;
   opacity:.7;filter:saturate(.8) contrast(1.06) brightness(.82)}
 .field-drawn{transition:opacity 1.2s var(--ease)}
 .amb.has-photo .field-drawn{opacity:0}
-@keyframes heroPan{from{transform:scale(1.06)}to{transform:scale(1.14) translate3d(-1.8%,-1.2%,0)}}
-@keyframes heroPanAlt{from{transform:scale(1.13) translate3d(1.4%,.8%,0)}to{transform:scale(1.05)}}
+@keyframes heroPan{from{transform:scale(1.04)}to{transform:scale(1.18) translate3d(-2.8%,-1.9%,0)}}
+@keyframes heroPanAlt{from{transform:scale(1.17) translate3d(2.4%,1.3%,0)}to{transform:scale(1.04)}}
 .amb{position:absolute;inset:0;opacity:0;transition:opacity 1.5s var(--ease)}
 .amb.on{opacity:1}
 .amb svg{position:absolute;inset:0;z-index:3;width:100%;height:100%}
@@ -264,7 +268,7 @@ body::after{
 .hero-nav{display:flex;gap:clamp(12px,2.2vw,30px)}
 .hnav{background:none;border:0;padding:0;cursor:pointer;text-align:left;
   min-width:clamp(66px,10.5vw,146px);color:var(--dust);
-  font-family:var(--f-mono);font-weight:300;font-size:10px;letter-spacing:.2em;
+  font-family:var(--f-mono);font-weight:300;font-size:13px;letter-spacing:.13em;
   text-transform:uppercase;transition:color .5s var(--ease)}
 .hnav.on{color:var(--bone)}
 .hnav-track{display:block;height:1px;background:var(--seam);position:relative;
@@ -351,8 +355,8 @@ body::after{
 .sw-foot{flex:none;margin-top:clamp(16px,2.6vh,30px);padding-top:18px;border-top:1px solid var(--rule)}
 .sw-steps{display:flex;gap:clamp(14px,2.6vw,40px)}
 .sw-step{background:none;border:0;padding:0;cursor:pointer;text-align:left;flex:1;
-  font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--mute);transition:color .45s var(--ease)}
+  font-family:var(--f-mono);font-size:clamp(11.5px,1.02vw,13.5px);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--mute);transition:color .45s var(--ease)}
 .sw-step.on{color:var(--ink)}
 .sw-step span{display:block;height:1px;background:var(--rule);margin-bottom:11px;position:relative}
 .sw-step span::after{content:"";position:absolute;left:0;top:0;height:1px;width:0;
@@ -617,7 +621,7 @@ body::after{
 .biz-no{font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:var(--oxide)}
 .biz-t{margin-top:22px;font-size:clamp(18px,1.6vw,23px);font-weight:300;letter-spacing:-.02em;line-height:1.36}
 .biz-d{margin-top:14px;font-size:14px;line-height:1.72;color:var(--dust)}
-.biz-more{margin-top:26px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.16em;
+.biz-more{margin-top:26px;font-family:var(--f-mono);font-size:13.5px;letter-spacing:.1em;
   color:var(--dust);text-transform:uppercase;display:inline-flex;gap:8px;transition:.3s}
 .biz:hover .biz-more{color:var(--oxide);gap:14px}
 @media(max-width:1000px){.biz-grid{grid-template-columns:repeat(2,1fr)}
@@ -663,7 +667,7 @@ body::after{
 .cta-t{margin-top:26px;font-size:clamp(21px,2.1vw,29px);font-weight:300;letter-spacing:-.025em}
 .cta-d{margin-top:13px;font-size:14px;line-height:1.72;color:var(--dust);max-width:30ch}
 .cta-link{margin-top:32px;display:inline-flex;align-items:center;gap:10px;
-  font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  font-family:var(--f-mono);font-size:14px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--bone);border-bottom:1px solid var(--seam);padding-bottom:8px;transition:.35s var(--ease)}
 .cta-card:hover .cta-link{color:var(--oxide);border-bottom-color:var(--oxide);gap:16px}
 @media(max-width:900px){.cta-grid{grid-template-columns:1fr}}
@@ -672,13 +676,13 @@ body::after{
 .foot{padding:clamp(50px,7vh,74px) var(--pad);background:var(--soil);border-top:1px solid var(--seam)}
 .foot-wrap{max-width:1320px;margin:0 auto;display:flex;justify-content:space-between;
   gap:38px;flex-wrap:wrap;align-items:flex-start}
-.foot-info{font-size:13px;line-height:1.95;color:var(--dust)}
+.foot-info{font-size:15px;line-height:1.95;color:var(--dust)}
 .foot-info .brand{margin-bottom:16px}
-.foot-links{display:flex;gap:26px;font-family:var(--f-mono);font-size:11px;
-  letter-spacing:.14em;color:var(--dust);text-transform:uppercase;flex-wrap:wrap}
+.foot-links{display:flex;gap:24px;font-family:var(--f-mono);font-size:14px;
+  letter-spacing:.08em;color:var(--dust);text-transform:uppercase;flex-wrap:wrap}
 .foot-links a{transition:.3s}.foot-links a:hover{color:var(--oxide)}
 .foot-note{width:100%;margin-top:34px;padding-top:22px;border-top:1px solid var(--seam);
-  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;color:var(--oxide-dim)}
+  font-family:var(--f-mono);font-size:12.5px;letter-spacing:.06em;color:var(--oxide-dim)}
 
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
