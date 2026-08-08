@@ -66,7 +66,9 @@ svg [stroke="#8C8D88"]{stroke:var(--dust)}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:var(--void);color:var(--bone);font-family:var(--f-sans);font-weight:300;
-  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  /* 한글은 어절 단위로만 끊는다. 한 덩어리가 줄보다 길 때만 overflow-wrap이 받는다. */
+  word-break:keep-all;overflow-wrap:break-word}
 ::selection{background:var(--oxide);color:var(--void)}
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
@@ -270,6 +272,8 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
 .foot-info a{transition:color .3s}
 .foot-info a:hover{color:var(--oxide)}
 /* 약관류는 메뉴가 아니라 사업자 정보에 붙는다 */
+/* 번호·번지처럼 쪼개지면 안 되는 덩어리 */
+.nb{white-space:nowrap}
 .foot-legal{margin-top:20px;display:flex;flex-wrap:wrap;gap:16px;
   font-family:var(--f-mono);font-size:12.5px;letter-spacing:.06em}
 .foot-links{display:flex;gap:24px;font-family:var(--f-mono);font-size:14px;
@@ -400,7 +404,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
         <dl class="co-facts rv rv-d3">
           <div class="co-fact">
             <dt>소재지</dt>
-            <dd>경상북도 성주군 월항면 주산로 488-24</dd>
+            <dd>경상북도 성주군 월항면 <span class="nb">주산로 488-24</span></dd>
           </div>
           <div class="co-fact">
             <dt>사업 영역</dt>
@@ -583,7 +587,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
         <div class="tl-items">
           <div class="tl-item"><span class="tl-dot"></span><p><strong>농업 AI 솔루션 개발</strong> — 데이터 기반 재배 의사결정 서비스</p></div>
           <div class="tl-item"><span class="tl-dot"></span><p><strong>누적 컨설팅 3,000+ 농가</strong> · 연평균 성장률 130%</p></div>
-          <div class="tl-item"><span class="tl-dot"></span><p>글로벌 파트너십 확대 — 농협, 고령군, 성주군, T-CHEM 등</p></div>
+          <div class="tl-item"><span class="tl-dot"></span><p>글로벌 파트너십 확대 — 농협, 고령군, 성주군, <span class="nb">T-CHEM</span> 등</p></div>
           <div class="tl-item"><span class="tl-dot"></span><p>홈페이지 리뉴얼 및 IR 활동 본격화</p></div>
         </div>
       </div>
@@ -597,7 +601,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
     <div class="foot-info">
       <div class="brand"><svg class="brand-mark" viewBox="0 0 1530 611"><use href="#abxMark"/></svg>AIBOX</div>
       <address>
-        경상북도 성주군 월항면 주산로 488-24<br>
+        경상북도 성주군 월항면 <span class="nb">주산로 488-24</span><br>
         <a href="tel:+82549318619">054-931-8619</a><br>
         <a href="mailto:contact@ai-box.co.kr">contact@ai-box.co.kr</a>
       </address>
@@ -609,7 +613,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
       <a href="about.html">회사소개</a><a href="#">사업영역</a><a href="#">제품</a>
       <a href="#">뉴스룸</a><a href="#">채용</a>
     </div>
-    <div class="foot-note">© 2026 AIBOX. 대표 박정현 · 사업자등록번호 000-00-00000 · 경상북도 성주군 월항면 주산로 488-24</div>
+    <div class="foot-note">© 2026 AIBOX. 대표 박정현 · 사업자등록번호 <span class="nb">000-00-00000</span> · 경상북도 성주군 월항면 <span class="nb">주산로 488-24</span></div>
   </div>
 </footer>
 
