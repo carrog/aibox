@@ -190,9 +190,14 @@ body::after{
   animation:heroPan 36s ease-in-out infinite alternate}
 .amb-photo img{width:100%;height:100%;object-fit:cover;object-position:54% 46%;
   opacity:.74;filter:saturate(.86) contrast(1.05) brightness(.88)}
+/* 슬라이드 03 — 반대 방향으로 더 느리게 흘러 두 사진이 같은 움직임으로 보이지 않게 */
+.amb-photo--slow{animation:heroPanAlt 46s ease-in-out infinite alternate}
+.amb-photo--slow img{object-position:50% 58%;
+  opacity:.7;filter:saturate(.8) contrast(1.06) brightness(.82)}
 .field-drawn{transition:opacity 1.2s var(--ease)}
 .amb.has-photo .field-drawn{opacity:0}
 @keyframes heroPan{from{transform:scale(1.06)}to{transform:scale(1.14) translate3d(-1.8%,-1.2%,0)}}
+@keyframes heroPanAlt{from{transform:scale(1.13) translate3d(1.4%,.8%,0)}to{transform:scale(1.05)}}
 .amb{position:absolute;inset:0;opacity:0;transition:opacity 1.5s var(--ease)}
 .amb.on{opacity:1}
 .amb svg{position:absolute;inset:0;z-index:3;width:100%;height:100%}
@@ -713,7 +718,7 @@ body::after{
     AIBOX
   </a>
   <div class="nav-links">
-    <a href="#statement">회사소개</a>
+    <a href="about.html">회사소개</a>
     <a href="#descent">기술</a>
     <a href="#products">제품</a>
     <a href="#business">사업영역</a>
@@ -816,7 +821,11 @@ body::after{
 
     <!-- 03 · 투입과 수확 · 뿌리 -->
     <div class="amb amb-2" data-s="2">
-      <svg viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+      <picture class="amb-photo amb-photo--slow">
+        <source media="(max-width:760px)" srcset="hero-harvest-portrait.jpg" width="700" height="1129">
+        <img src="hero-harvest.jpg" width="1440" height="804" alt="" aria-hidden="true" decoding="async">
+      </picture>
+      <svg class="field-drawn" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
         <!-- 토양 경계 -->
         <path d="M0 470H1400" stroke="#D4823A" stroke-width=".8" opacity=".38"/>
         <g stroke="#E9E6DF" stroke-width=".5" opacity=".09">
@@ -1526,7 +1535,7 @@ body::after{
       contact@ai-box.co.kr
     </div>
     <div class="foot-links">
-      <a href="#">회사소개</a><a href="#">사업영역</a><a href="#">제품</a>
+      <a href="about.html">회사소개</a><a href="#">사업영역</a><a href="#">제품</a>
       <a href="#">뉴스룸</a><a href="#">채용</a><a href="#">개인정보처리방침</a><a href="#">이용약관</a>
     </div>
     <div class="foot-note">© 2026 AIBOX. 사업자등록번호 · 대표자명 · 주소 — 확정 후 삽입</div>

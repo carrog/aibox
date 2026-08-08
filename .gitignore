@@ -1,3 +1,10 @@
 Thumbs.db
 .DS_Store
 .claude/
+
+# 작업용 원본/문서 — 사이트 자산 아님
+Gemini_Generated_Image_*.png
+Code_Generated_Image*.png
+*.docx
+*.xlsx
+~$*
