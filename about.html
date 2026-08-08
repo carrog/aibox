@@ -19,7 +19,50 @@
   --f-mono:"IBM Plex Mono","SFMono-Regular",Consolas,"IBM Plex Sans KR","Malgun Gothic",monospace;
   --pad:clamp(20px,5vw,80px);
   --ease:cubic-bezier(.22,.61,.36,1);
+  --nav-bg:rgba(10,11,13,.78);
 }
+
+/* =====================  LIGHT THEME  ===================== */
+:root[data-theme="light"]{
+  --void:#FBFAF7; --soil:#EFEDE6; --strata:#FFFFFF; --seam:#D9D4C8;
+  --bone:#15171B; --dust:#63655E;
+  --oxide:#AC6220; --oxide-dim:#8A5526;
+  --verdigris:#3A6F60; --gold:#8A7433;
+  --nav-bg:rgba(251,250,247,.82);
+}
+/* 히어로는 양쪽 테마 모두 어둡게 — index.html과 같은 규칙 */
+:root[data-theme="light"] .ab-hero,
+:root[data-theme="light"] .nav.over-hero{
+  --void:#0A0B0D; --soil:#101215; --strata:#1A1D22; --seam:#262A31;
+  --bone:#E9E6DF; --dust:#8C8D88;
+  --oxide:#D4823A; --oxide-dim:#7A4A21;
+  --verdigris:#4E8C7D; --gold:#C2A24B;
+  --nav-bg:rgba(10,11,13,.78);
+  color:var(--bone);
+}
+:root[data-theme="light"] .ab-hero{background-color:#0A0B0D}
+/* SVG 프레젠테이션 속성은 var()를 못 받는다. CSS가 속성보다 우선하는 점을 이용한다. */
+svg [fill="#D4823A"]{fill:var(--oxide)}
+svg [stroke="#D4823A"]{stroke:var(--oxide)}
+svg [fill="#4E8C7D"]{fill:var(--verdigris)}
+svg [stroke="#4E8C7D"]{stroke:var(--verdigris)}
+svg [fill="#E9E6DF"]{fill:var(--bone)}
+svg [stroke="#E9E6DF"]{stroke:var(--bone)}
+svg [fill="#8C8D88"]{fill:var(--dust)}
+svg [stroke="#8C8D88"]{stroke:var(--dust)}
+
+/* 테마 토글 */
+.theme-btn{background:none;border:1px solid var(--seam);color:var(--dust);cursor:pointer;
+  width:36px;height:34px;border-radius:2px;display:flex;align-items:center;justify-content:center;
+  padding:0;transition:.3s var(--ease)}
+.theme-btn:hover{color:var(--bone);border-color:var(--dust)}
+.theme-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;
+  stroke-linecap:round;stroke-linejoin:round}
+.theme-btn .i-sun{display:none}
+:root[data-theme="light"] .theme-btn .i-sun{display:block}
+:root[data-theme="light"] .theme-btn .i-moon{display:none}
+:root[data-theme="light"] .nav.over-hero .theme-btn .i-sun{display:none}
+:root[data-theme="light"] .nav.over-hero .theme-btn .i-moon{display:block}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:var(--void);color:var(--bone);font-family:var(--f-sans);font-weight:300;
@@ -59,7 +102,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
   padding:20px var(--pad);
   transition:background .45s var(--ease),padding .45s var(--ease),border-color .45s;
   border-bottom:1px solid transparent}
-.nav.stuck{background:rgba(10,11,13,.78);backdrop-filter:blur(16px) saturate(140%);
+.nav.stuck{background:var(--nav-bg);backdrop-filter:blur(16px) saturate(140%);
   padding:13px var(--pad);border-bottom-color:var(--seam)}
 .nav .brand{gap:13px;font-size:17px}
 .nav .brand-mark{height:25px}
@@ -225,13 +268,23 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
   letter-spacing:.08em;color:var(--dust);text-transform:uppercase;flex-wrap:wrap}
 .foot-links a{transition:.3s}.foot-links a:hover{color:var(--oxide)}
 .foot-note{width:100%;margin-top:34px;padding-top:22px;border-top:1px solid var(--seam);
-  font-family:var(--f-mono);font-size:12.5px;letter-spacing:.06em;color:var(--oxide-dim)}
+  font-family:var(--f-mono);font-size:12.5px;letter-spacing:.06em;color:var(--dust)}
 
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
   .rv{opacity:1;transform:none}
 }
 </style>
+<script>
+/* 첫 페인트 전에 테마를 확정한다 */
+(function(){
+  try{
+    var t = localStorage.getItem('aibox-theme');
+    if(!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    if(t === 'light') document.documentElement.setAttribute('data-theme','light');
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 
@@ -268,6 +321,10 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
         <button role="menuitem">العربية</button>
       </div>
     </div>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="밝은 테마로 전환">
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+    </button>
     <a href="index.html#cta" class="nav-cta">문의하기</a>
   </div>
 </nav>
@@ -572,7 +629,29 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
 
   /* nav stuck */
   window.addEventListener('scroll', function(){
-    if(nav) nav.classList.toggle('stuck', window.scrollY > 40);
+    if(nav){
+      nav.classList.toggle('stuck', window.scrollY > 40);
+      var heroEl = document.querySelector('.ab-hero');
+      if(heroEl) nav.classList.toggle('over-hero',
+        window.scrollY < heroEl.offsetHeight - nav.offsetHeight);
+    }
+    (function(){
+      var btn = document.getElementById('themeBtn');
+      if(!btn || btn.dataset.bound) return;
+      btn.dataset.bound = '1';
+      var root = document.documentElement;
+      function label(){
+        var light = root.getAttribute('data-theme') === 'light';
+        btn.setAttribute('aria-label', light ? '어두운 테마로 전환' : '밝은 테마로 전환');
+      }
+      label();
+      btn.addEventListener('click', function(){
+        var light = root.getAttribute('data-theme') === 'light';
+        if(light) root.removeAttribute('data-theme'); else root.setAttribute('data-theme','light');
+        try{ localStorage.setItem('aibox-theme', light ? 'dark' : 'light'); }catch(e){}
+        label();
+      });
+    })();
   }, {passive:true});
 })();
 </script>
