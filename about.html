@@ -627,32 +627,45 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
   document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
   document.querySelectorAll('.vcard').forEach(function(el){ io.observe(el); });
 
-  /* nav stuck */
-  window.addEventListener('scroll', function(){
-    if(nav){
-      nav.classList.toggle('stuck', window.scrollY > 40);
-      var heroEl = document.querySelector('.ab-hero');
-      if(heroEl) nav.classList.toggle('over-hero',
-        window.scrollY < heroEl.offsetHeight - nav.offsetHeight);
+  /* nav stuck / over-hero */
+  function navTick(){
+    if(!nav) return;
+    nav.classList.toggle('stuck', window.scrollY > 40);
+    var heroEl = document.querySelector('.ab-hero');
+    /* 히어로는 두 테마 모두 어둡다. 그 위에 있는 동안은 상단 바도 어두운 팔레트를 써야
+       밝은 테마에서 글자가 사진 위로 사라지지 않는다. */
+    if(heroEl) nav.classList.toggle('over-hero',
+      window.scrollY < heroEl.offsetHeight - nav.offsetHeight);
+  }
+  window.addEventListener('scroll', navTick, {passive:true});
+  window.addEventListener('resize', navTick);
+  navTick();                      /* 스크롤 전에도 상태가 맞아야 한다 */
+
+  /* ---- 테마 토글 ---- */
+  (function(){
+    var btn = document.getElementById('themeBtn');
+    if(!btn) return;
+    var root = document.documentElement;
+    function label(){
+      var light = root.getAttribute('data-theme') === 'light';
+      btn.setAttribute('aria-label', light ? '어두운 테마로 전환' : '밝은 테마로 전환');
     }
-    (function(){
-      var btn = document.getElementById('themeBtn');
-      if(!btn || btn.dataset.bound) return;
-      btn.dataset.bound = '1';
-      var root = document.documentElement;
-      function label(){
-        var light = root.getAttribute('data-theme') === 'light';
-        btn.setAttribute('aria-label', light ? '어두운 테마로 전환' : '밝은 테마로 전환');
-      }
+    label();
+    btn.addEventListener('click', function(){
+      var light = root.getAttribute('data-theme') === 'light';
+      if(light) root.removeAttribute('data-theme');
+      else root.setAttribute('data-theme','light');
+      try{ localStorage.setItem('aibox-theme', light ? 'dark' : 'light'); }catch(e){}
       label();
-      btn.addEventListener('click', function(){
-        var light = root.getAttribute('data-theme') === 'light';
-        if(light) root.removeAttribute('data-theme'); else root.setAttribute('data-theme','light');
-        try{ localStorage.setItem('aibox-theme', light ? 'dark' : 'light'); }catch(e){}
-        label();
-      });
-    })();
-  }, {passive:true});
+    });
+    /* 저장된 선택이 없을 때만 OS 설정 변화를 따라간다 */
+    var mq = matchMedia('(prefers-color-scheme: light)');
+    (mq.addEventListener ? mq.addEventListener.bind(mq,'change') : mq.addListener.bind(mq))(function(e){
+      try{ if(localStorage.getItem('aibox-theme')) return; }catch(err){}
+      if(e.matches) root.setAttribute('data-theme','light'); else root.removeAttribute('data-theme');
+      label();
+    });
+  })();
 })();
 </script>
 </body>

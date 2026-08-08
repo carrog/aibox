@@ -2054,8 +2054,11 @@ svg [stroke="#262A31"]{stroke:var(--seam)}
     requestAnimationFrame(function(){ tick(); swTick(); pfTick(); ticking = false; });
   }
   window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('resize', function(){ tick(); swTick(); pfTick(); });
-  tick(); swTick(); pfTick();
+  window.addEventListener('resize', function(){ onScroll(); tick(); swTick(); pfTick(); });
+  /* onScroll이 상단 바의 over-hero도 정한다. 여기서 한 번 돌려두지 않으면
+     밝은 테마로 페이지를 열었을 때 첫 스크롤 전까지 네비가 밝은 팔레트를 써서
+     어두운 히어로 위에서 글자가 묻힌다. */
+  onScroll(); tick(); swTick(); pfTick();
 
   /* 영상 로드 실패 시 fallback 유지 */
   document.querySelectorAll('video').forEach(function(v){
