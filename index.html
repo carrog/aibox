@@ -562,15 +562,26 @@ body::after{
 .card-kr{margin-top:11px;font-size:15px;color:var(--oxide);letter-spacing:-.01em}
 .card-desc{margin-top:22px;font-size:15px;line-height:1.78;color:var(--dust);max-width:40ch}
 .card-specs{margin-top:30px;display:flex;flex-wrap:wrap;gap:9px}
-.spec{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--dust);border:1px solid var(--seam);padding:6px 11px;border-radius:2px}
+.spec{font-family:var(--f-mono);font-size:13.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dust);border:1px solid var(--seam);padding:7px 13px;border-radius:2px}
 .spec--v{color:var(--verdigris);border-color:rgba(78,140,125,.42)}
 .spec--o{color:var(--oxide);border-color:rgba(212,130,58,.42)}
 .spec--g{color:var(--gold);border-color:rgba(194,162,75,.42)}
 .card-visual{position:relative;background:var(--void);border-left:1px solid var(--seam);overflow:hidden}
-.card-visual svg{position:absolute;inset:0;width:100%;height:100%}
+.card-visual svg{position:absolute;inset:0;width:100%;height:100%;
+  transition:opacity .9s var(--ease)}
 /* ▼ 제품 영상 슬롯 */
 .card-visual video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5}
+/* ▼ 제품 사진 슬롯 — 카드가 보이면 일러스트 아래에서 배어 나오고, 호버에서 앞으로 나온다 */
+.cv-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transform:scale(1.09);
+  filter:saturate(.66) contrast(1.05) brightness(.74);
+  transition:opacity 1.2s var(--ease),transform 1.8s var(--ease),filter .7s var(--ease)}
+.card.shown .cv-photo{opacity:.6;transform:scale(1.02)}
+.card.shown .card-visual.has-photo svg{opacity:.55}
+.card:hover .cv-photo{opacity:.84;transform:scale(1);
+  filter:saturate(.94) contrast(1.06) brightness(.92)}
+.card:hover .card-visual.has-photo svg{opacity:.28}
 @media(max-width:900px){
   .card{grid-template-columns:1fr;min-height:0}
   .card-visual{height:210px;border-left:0;border-top:1px solid var(--seam)}
@@ -1250,6 +1261,8 @@ body::after{
         </div>
       </div>
       <div class="card-visual">
+        <img class="cv-photo" src="product-nanogel.jpg" alt="" aria-hidden="true"
+             loading="lazy" decoding="async" width="1440" height="680">
         <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">
           <defs><radialGradient id="g1"><stop offset="0" stop-color="#D4823A" stop-opacity=".28"/>
             <stop offset="1" stop-color="#D4823A" stop-opacity="0"/></radialGradient></defs>
@@ -1620,6 +1633,27 @@ body::after{
     es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }});
   }, {threshold:.15, rootMargin:'0px 0px -8% 0px'});
   document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  /* ---- 제품 카드: 사진 ↔ 일러스트 크로스페이드 ---- */
+  (function(){
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+    if(cards.length){
+      var cio = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('shown'); cio.unobserve(e.target); }});
+      }, {threshold:.25});
+      cards.forEach(function(c){ cio.observe(c); });
+    }
+    /* 사진이 실제로 로드된 카드에서만 일러스트를 물린다 */
+    document.querySelectorAll('.cv-photo').forEach(function(im){
+      var vis = im.parentNode;
+      function mark(){ if(vis && vis.classList) vis.classList.add('has-photo'); }
+      im.addEventListener('error', function(){
+        im.style.display = 'none';
+        if(vis && vis.classList) vis.classList.remove('has-photo');
+      }, true);
+      if(im.complete && im.naturalWidth) mark(); else im.addEventListener('load', mark);
+    });
+  })();
 
   /* ---- 섹션2 : 가로 패닝 ---- */
   var swSec = document.getElementById('statement');
