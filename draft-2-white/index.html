@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIBOX — Beyond Agriculture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#F8F7F3;--dark:#EFEDE6;--card:#FFFFFF;--edge:#DDD9CE;--mute:#5A5A55;--light:#3A3A38;--white:#111111;
+  --green:#00A843;--green-dim:#007A31;--green-dark:#00E85E;
+  --f-kr:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-en:"Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+  --pad:clamp(20px,5vw,80px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-snap-type:y proximity}
+.snap{scroll-snap-align:start;scroll-snap-stop:always;min-height:100svh}
+body{background:var(--black);color:var(--white);font-family:var(--f-kr);font-weight:400;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--green);color:var(--black)}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;width:100%}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}.rv-d3{transition-delay:.3s}.rv-d4{transition-delay:.4s}
+
+/* ========== NAV ========== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;
+  padding:18px var(--pad);gap:clamp(20px,4vw,48px);
+  transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+.nav.stuck{background:rgba(248,247,243,.85);backdrop-filter:blur(18px);border-bottom-color:var(--edge)}
+.logo{display:flex;align-items:center;gap:6px;margin-right:auto}
+.logo svg{height:26px;fill:var(--white)}
+.nav-mid{display:flex;gap:32px;font-size:16px;color:var(--mute);font-weight:400}
+.nav-mid a{transition:color .3s}.nav-mid a:hover{color:var(--white)}
+.lang-pill{font-size:14px;color:var(--light);border:1px solid var(--edge);
+  padding:7px 15px;border-radius:20px;background:none;cursor:pointer;transition:.3s;font-family:var(--f-en)}
+.lang-pill:hover{border-color:var(--mute);color:var(--white)}
+.nav-cta{font-size:14px;font-weight:600;color:var(--black);background:var(--green);
+  padding:10px 24px;border-radius:24px;display:flex;align-items:center;gap:6px;
+  transition:background .3s;white-space:nowrap}
+.nav-cta:hover{background:#33FF7A}
+.nav-cta svg{width:14px;height:14px;fill:currentColor}
+.nav-right{display:flex;align-items:center;gap:14px}
+@media(max-width:900px){.nav-mid{display:none}}
+
+/* ========== HERO ========== */
+.hero{position:relative;min-height:100svh;overflow:hidden}
+
+/* 슬라이드 트랙 */
+.hero-track{display:flex;width:400%;height:100svh;will-change:transform;
+  transition:transform .7s cubic-bezier(.4,.0,.2,1)}
+.hslide{width:25%;height:100%;position:relative;flex:none;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 var(--pad) clamp(44px,7vh,72px)}
+
+/* 배경 */
+.hs-bg{position:absolute;inset:0;z-index:0}
+.hs-bg svg{position:absolute;inset:0;width:100%;height:100%}
+.hs-bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.4;filter:saturate(.5)}
+.hs-scrim{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(248,247,243,.4) 0%,rgba(248,247,243,.08) 36%,rgba(248,247,243,.9) 100%)}
+.hslide[data-i="1"] .hs-scrim{background:linear-gradient(180deg,rgba(248,247,243,.2) 0%,rgba(248,247,243,.02) 40%,rgba(248,247,243,.75) 100%)}
+
+/* 텍스트 */
+.hs-inner{position:relative;z-index:2}
+.hero-label{font-family:var(--f-en);font-size:14px;font-weight:500;color:var(--mute);
+  letter-spacing:.06em;margin-bottom:24px;
+  opacity:0;transform:translateY(16px);transition:opacity .7s .15s var(--ease),transform .7s .15s var(--ease)}
+.hero-h{font-size:clamp(36px,7.2vw,80px);font-weight:900;line-height:1.12;letter-spacing:-.04em;
+  opacity:0;transform:translateY(20px);transition:opacity .8s .25s var(--ease),transform .8s .25s var(--ease)}
+.hero-h em{font-style:normal;color:var(--green)}
+.hero-sub{margin-top:clamp(14px,2vh,22px);font-size:clamp(14px,1.3vw,17px);line-height:1.8;
+  color:var(--mute);max-width:44ch;
+  opacity:0;transform:translateY(16px);transition:opacity .7s .38s var(--ease),transform .7s .38s var(--ease)}
+.hslide.on .hero-label,
+.hslide.on .hero-h,
+.hslide.on .hero-sub{opacity:1;transform:none}
+
+/* 하단 바 */
+.hero-bar{position:absolute;left:0;right:0;bottom:0;z-index:10;
+  padding:0 var(--pad) clamp(28px,4vh,44px);
+  display:flex;align-items:flex-end;justify-content:space-between}
+.hero-nav{display:flex;gap:clamp(12px,2.4vw,28px)}
+.hn{background:none;border:0;padding:0;cursor:pointer;text-align:left;
+  min-width:clamp(60px,10vw,140px);transition:color .4s;color:var(--mute);
+  font-family:var(--f-en);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.hn.on{color:var(--white)}
+.hn-bar{display:block;height:2px;background:var(--edge);margin-bottom:10px;position:relative;overflow:hidden}
+.hn-bar i{position:absolute;left:0;top:0;height:100%;width:0;background:var(--green)}
+.hn-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-scroll{display:flex;align-items:center;gap:10px;
+  font-family:var(--f-en);font-size:11px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase}
+.hero-scroll svg{width:18px;height:18px;stroke:var(--mute);stroke-width:1.5;fill:none;
+  animation:bob 2.4s infinite var(--ease)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+@media(max-width:640px){.hn-label{display:none}.hn{min-width:36px}}
+
+/* ========== PERFORMANCE ========== */
+.perf{padding:clamp(80px,12vh,140px) var(--pad);border-top:1px solid var(--edge);display:flex;align-items:center}
+.perf{position:relative;overflow:hidden}
+.perf .wrap{position:relative;z-index:2}
+
+/* 배경 라인차트 */
+.perf-bg{position:absolute;inset:0;z-index:0;pointer-events:none;
+  opacity:0;transition:opacity 1.2s var(--ease)}
+.perf.in-view .perf-bg{opacity:1}
+.perf-bg svg{width:100%;height:100%;display:block}
+.pbg-grid{stroke:rgba(0,0,0,.06);stroke-width:1}
+.pbg-line{stroke:var(--green);stroke-width:1.4;fill:none;opacity:.55;
+  filter:drop-shadow(0 0 6px rgba(0,232,94,.25));
+  stroke-linecap:round}
+.pbg-fill{fill:url(#pbgGrad);opacity:0}
+.perf.in-view .pbg-fill{opacity:1;transition:opacity 1.6s .4s var(--ease)}
+.pbg-line-draw{stroke-dasharray:2500;stroke-dashoffset:2500}
+.perf.in-view .pbg-line-draw{
+  animation:pbgDraw 3.2s .2s cubic-bezier(.4,.0,.2,1) forwards}
+@keyframes pbgDraw{to{stroke-dashoffset:0}}
+
+/* dot — 로딩 시 1회, 라인 90%까지 상승 후 정지 */
+.pbg-dot{fill:var(--green);r:6;filter:drop-shadow(0 0 8px rgba(0,232,94,.7));
+  offset-path:path("M0 420 C160 400 250 340 400 300 C520 268 620 300 720 300 C820 300 900 268 1000 220 C1140 155 1260 100 1400 60");
+  offset-rotate:0deg;offset-distance:0%;opacity:0}
+.perf.in-view .pbg-dot{animation:pbgTravel 3.6s .5s cubic-bezier(.22,.61,.36,1) forwards}
+@keyframes pbgTravel{
+  0%{offset-distance:0%;opacity:0}
+  10%{opacity:1}
+  100%{offset-distance:90%;opacity:1}
+}
+/* halo — dot에 붙어 계속 펄스 */
+.pbg-halo{fill:none;stroke:var(--green);stroke-width:1;opacity:0;
+  offset-path:path("M0 420 C160 400 250 340 400 300 C520 268 620 300 720 300 C820 300 900 268 1000 220 C1140 155 1260 100 1400 60");
+  offset-distance:0%;r:12}
+.perf.in-view .pbg-halo{animation:pbgTravel 3.6s .5s cubic-bezier(.22,.61,.36,1) forwards,
+  pbgPulse 1.6s 4.1s infinite}
+@keyframes pbgPulse{0%,100%{r:10;opacity:.55}50%{r:20;opacity:0}}
+
+/* 숫자 영역 소폭 부양 강조 */
+.pn-val{position:relative;display:inline-flex;align-items:baseline}
+.pn-val::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--green),transparent);
+  opacity:0;transition:opacity 1s var(--ease)}
+.perf.in-view .pn-val::after{opacity:.4}
+
+.perf-label{font-family:var(--f-en);font-size:clamp(22px,2.6vw,32px);font-weight:700;color:var(--green);
+  letter-spacing:.06em;text-transform:uppercase}
+.perf-body{margin-top:clamp(16px,2vh,24px)}
+.perf-body h2{font-family:var(--f-en);font-size:clamp(24px,3.6vw,42px);font-weight:700;
+  line-height:1.2;letter-spacing:-.03em;color:var(--white)}
+.perf-body p{margin-top:14px;font-size:15px;line-height:1.75;color:var(--mute);max-width:50ch}
+.perf-nums{margin-top:clamp(36px,5vh,56px);display:grid;grid-template-columns:repeat(3,1fr);
+  gap:clamp(20px,4vw,48px);border-top:1px solid var(--edge);padding-top:28px}
+.pn-val{font-family:var(--f-en);font-size:clamp(32px,5vw,56px);font-weight:800;
+  letter-spacing:-.04em;color:var(--green);line-height:1}
+.pn-label{margin-top:10px;font-size:13px;color:var(--mute)}
+
+/* partners */
+.partners{margin-top:clamp(44px,6vh,64px);display:flex;flex-direction:column;gap:12px}
+.p-row{overflow:hidden;
+  mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.p-belt{display:flex;gap:12px;width:max-content}
+.p-row:nth-child(1) .p-belt{animation:beltL 36s linear infinite}
+.p-row:nth-child(2) .p-belt{animation:beltR 40s linear infinite}
+.p-row:hover .p-belt{animation-play-state:paused}
+@keyframes beltL{to{transform:translate3d(-50%,0,0)}}
+@keyframes beltR{from{transform:translate3d(-50%,0,0)}to{transform:translate3d(0,0,0)}}
+.p-card{flex:none;display:flex;align-items:center;justify-content:center;
+  min-width:140px;height:52px;padding:0 22px;
+  background:#FFFFFF;color:#111;border:1px solid var(--edge);border-radius:var(--r);
+  font-size:13px;font-weight:600;color:var(--black);letter-spacing:.01em;
+  transition:transform .3s var(--ease)}
+.p-card:hover{transform:translateY(-3px)}
+
+/* ========== PRODUCTS ========== */
+.products{padding:clamp(80px,12vh,140px) var(--pad);border-top:1px solid var(--edge);display:flex;align-items:center}
+.prod-label{font-family:var(--f-en);font-size:clamp(22px,2.6vw,32px);font-weight:700;color:var(--green);
+  letter-spacing:.06em;text-transform:uppercase}
+.prod-desc{margin-top:10px;font-size:15px;line-height:1.75;color:var(--mute);max-width:52ch}
+.prod-tabs{margin-top:clamp(24px,3.6vh,36px);display:flex;gap:10px;flex-wrap:wrap}
+.ptab{font-size:14px;font-weight:600;padding:10px 24px;border-radius:24px;border:0;cursor:pointer;
+  transition:background .3s,color .3s}
+.ptab.on{background:var(--green);color:var(--black)}
+.ptab:not(.on){background:var(--card);color:var(--light);border:1px solid var(--edge)}
+.ptab:not(.on):hover{background:var(--edge);color:var(--white)}
+.prod-grid{margin-top:clamp(28px,4vh,44px);display:grid;
+  grid-template-columns:repeat(4,1fr);gap:20px;padding:20px 0;
+  overflow:visible;position:relative}
+.pcard{position:relative;border-radius:32px;background:var(--card);
+  border:1px solid var(--edge);aspect-ratio:3/4;
+  transition:border-color .45s,transform .5s var(--ease),box-shadow .5s var(--ease);
+  cursor:pointer;overflow:hidden}
+.pcard:hover{border-color:var(--green-dim);transform:translateY(-10px) scale(1.06);z-index:5;
+  box-shadow:0 30px 60px -20px rgba(0,232,94,.28)}
+.pcard-img{position:absolute;inset:0;transition:transform .6s var(--ease)}
+.pcard-img svg{width:100%;height:100%;display:block}
+.pcard:hover .pcard-img{transform:scale(1.08)}
+.pcard-info{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:22px 24px 26px;
+  background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.5) 55%,transparent 100%)}
+.pcard-name{font-size:18px;font-weight:700;color:var(--white)}
+.pcard-sub{font-size:12px;color:var(--light);margin-top:4px}
+@media(max-width:900px){.prod-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.prod-grid{grid-template-columns:1fr}}
+
+/* ========== CONTENTS ========== */
+.contents{padding:clamp(80px,12vh,140px) var(--pad);border-top:1px solid var(--edge);
+  position:relative;overflow:hidden;display:flex;align-items:center}
+.cont-label{font-family:var(--f-en);font-size:clamp(22px,2.6vw,32px);font-weight:700;color:var(--green);
+  letter-spacing:.06em;text-transform:uppercase}
+.cont-desc{margin-top:10px;font-size:15px;line-height:1.75;color:var(--mute);max-width:52ch}
+.cont-pills{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}
+.cont-pill{font-size:13px;font-weight:500;padding:8px 18px;border-radius:20px;
+  border:1px solid var(--green);color:var(--green);background:none;cursor:pointer;
+  transition:.3s}
+.cont-pill:hover{background:var(--green);color:var(--black)}
+.cont-visual{margin-top:clamp(40px,6vh,72px);position:relative}
+.cont-visual-mask{overflow:hidden;
+  mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+
+/* 슬라이더 화살표 버튼 */
+.slide-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(20,20,20,.88);border:1px solid var(--edge);
+  color:#F4F4F4;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .3s,transform .3s var(--ease),border-color .3s;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.slide-btn:hover{background:var(--green);color:var(--black);border-color:var(--green);
+  transform:translateY(-50%) scale(1.08)}
+.slide-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-btn:disabled:hover{background:rgba(20,20,20,.9);color:var(--white);
+  border-color:var(--edge);transform:translateY(-50%)}
+.slide-btn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.slide-btn-prev{left:clamp(8px,2vw,24px)}
+.slide-btn-next{right:clamp(8px,2vw,24px)}
+@media(max-width:640px){.slide-btn{width:44px;height:44px}}
+.cont-circle{position:absolute;bottom:-30%;left:50%;transform:translateX(-50%);
+  width:min(90vw,680px);aspect-ratio:1;border-radius:50%;background:var(--green);
+  opacity:.12;filter:blur(80px);pointer-events:none;z-index:0}
+.thumb-belt{display:flex;gap:20px;padding:20px 0;position:relative;z-index:1;
+  overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;
+  padding-left:calc((100% - min(1200px,100%))/2);
+  padding-right:calc((100% - min(1200px,100%))/2)}
+.thumb-belt::-webkit-scrollbar{display:none}
+.thumb{scroll-snap-align:start}
+.thumb{flex:none;width:clamp(240px,26vw,320px);aspect-ratio:16/10;
+  border-radius:20px;overflow:hidden;position:relative;
+  background:#FFF;border:1px solid var(--edge);display:block;text-decoration:none;color:inherit;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+  transition:transform .4s var(--ease),border-color .4s,box-shadow .4s var(--ease)}
+.thumb:hover{transform:translateY(-6px) scale(1.03);border-color:var(--green-dim);
+  box-shadow:0 20px 40px -12px rgba(0,232,94,.2)}
+.thumb-bg{position:absolute;inset:0}
+.thumb-bg svg{width:100%;height:100%}
+.thumb-top{position:absolute;top:12px;left:12px;right:12px;z-index:2;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(6px);
+  padding:6px 10px;border-radius:8px}
+.thumb-avatar{width:22px;height:22px;border-radius:50%;background:#E63946;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;color:#fff;flex:none}
+.thumb-title{font-size:11px;color:var(--white);line-height:1.35;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.thumb-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:2;
+  transition:transform .3s var(--ease),background .3s}
+.thumb-play::after{content:"";width:0;height:0;margin-left:4px;
+  border-left:14px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent}
+.thumb:hover .thumb-play{transform:translate(-50%,-50%) scale(1.1);background:rgba(230,57,70,.9)}
+.thumb-bar{position:absolute;left:0;right:0;bottom:0;z-index:2;
+  background:linear-gradient(0deg,rgba(0,0,0,.85),transparent);
+  padding:20px 12px 10px;display:flex;align-items:center;gap:10px}
+.thumb-mini{width:22px;height:22px;background:#111;border-radius:2px;flex:none;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700}
+.thumb-caption{font-size:10px;color:#DDD;letter-spacing:.05em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.thumb-time{font-size:10px;color:#BBB;font-family:var(--f-en)}
+
+/* ========== BOTTOM CTA ========== */
+.bcta{padding:clamp(80px,12vh,140px) var(--pad);text-align:center;
+  border-top:1px solid var(--edge);display:flex;align-items:center;justify-content:center;
+  scroll-snap-stop:normal}
+.bcta-title{font-family:var(--f-en);font-size:clamp(28px,4.8vw,52px);font-weight:800;
+  letter-spacing:-.03em;color:var(--green)}
+.bcta-desc{margin-top:14px;font-size:15px;line-height:1.75;color:var(--mute);max-width:44ch;
+  margin-left:auto;margin-right:auto}
+.bcta-cards{margin-top:clamp(32px,5vh,52px);display:grid;
+  grid-template-columns:repeat(3,1fr);gap:14px;max-width:800px;margin-left:auto;margin-right:auto}
+.bcta-card{background:var(--card);border:1px solid var(--edge);border-radius:var(--r);
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--mute);transition:border-color .4s}
+.bcta-card:hover{border-color:var(--green-dim)}
+.bcta-btn{margin-top:clamp(36px,5vh,52px);display:inline-flex;align-items:center;gap:10px;
+  font-size:16px;font-weight:700;color:var(--black);background:var(--green);
+  padding:16px 40px;border-radius:40px;border:0;cursor:pointer;
+  transition:background .3s,transform .3s var(--ease)}
+.bcta-btn:hover{background:#33FF7A;transform:translateY(-2px)}
+.bcta-btn svg{width:18px;height:18px;fill:currentColor}
+
+/* ========== FOOTER ========== */
+.foot{padding:clamp(40px,6vh,60px) var(--pad);border-top:1px solid var(--edge);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;
+  scroll-snap-align:end}
+.foot-copy{font-size:12px;color:var(--mute)}
+.foot-links{display:flex;gap:24px;font-size:12px;color:var(--mute)}
+.foot-links a{transition:color .3s}.foot-links a:hover{color:var(--green)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .rv{opacity:1;transform:none}
+}
+
+/* ===== 우측 섹션 네비게이션 ===== */
+.sec-nav{position:fixed;top:50%;right:clamp(16px,3vw,40px);transform:translateY(-50%);z-index:150;
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  opacity:0;transition:opacity .6s var(--ease) .4s;pointer-events:none}
+.sec-nav.ready{opacity:1;pointer-events:auto}
+.sn-item{position:relative;padding:12px 0;display:flex;align-items:center;justify-content:center;
+  text-decoration:none}
+.sn-item::before{content:"";position:absolute;top:100%;left:50%;width:1px;height:26px;
+  background:rgba(0,0,0,.14);transform:translateX(-50%)}
+.sn-item:last-child::before{display:none}
+.sn-dot{width:10px;height:10px;border-radius:50%;
+  background:transparent;border:1.5px solid rgba(0,0,0,.25);
+  transition:background .35s var(--ease),border-color .35s,transform .35s var(--ease),
+             box-shadow .35s var(--ease)}
+.sn-item:hover .sn-dot{border-color:var(--green);transform:scale(1.2)}
+.sn-item.on .sn-dot{background:var(--green);border-color:var(--green);
+  box-shadow:0 0 0 4px rgba(0,232,94,.18),0 0 12px rgba(0,232,94,.6)}
+.sn-label{position:absolute;right:26px;top:50%;transform:translateY(-50%);
+  font-family:var(--f-en);font-size:11px;font-weight:600;letter-spacing:.14em;
+  color:var(--white);text-transform:uppercase;
+  background:rgba(20,20,20,.9);padding:6px 12px;border-radius:16px;
+  color:#F4F4F4;border:1px solid rgba(0,0,0,.3);white-space:nowrap;
+  opacity:0;transform:translate(8px,-50%);pointer-events:none;
+  transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.sn-item:hover .sn-label{opacity:1;transform:translate(0,-50%)}
+@media(max-width:720px){.sec-nav{right:8px}.sn-label{display:none}}
+
+</style>
+</head>
+<body>
+<!-- 우측 섹션 네비게이션 -->
+<nav class="sec-nav" id="secNav" aria-label="섹션 이동">
+  <a href="#hero"       class="sn-item" data-target="hero"><span class="sn-label">Home</span><span class="sn-dot"></span></a>
+  <a href="#perf"       class="sn-item" data-target="perf"><span class="sn-label">Performance</span><span class="sn-dot"></span></a>
+  <a href="#products"   class="sn-item" data-target="products"><span class="sn-label">Products</span><span class="sn-dot"></span></a>
+  <a href="#contents"   class="sn-item" data-target="contents"><span class="sn-label">Contents</span><span class="sn-dot"></span></a>
+  <a href="#cta"        class="sn-item" data-target="cta"><span class="sn-label">Contact</span><span class="sn-dot"></span></a>
+</nav>
+
+
+<!-- LOGO SYMBOL -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="abx" viewBox="0 0 1530 611">
+    <path d="M304 0 H609 L618 150 L765 0 H1069 L1078 150 L1227 0 H1528
+             L1530 305 L1224 611 H922 L913 461 L763 611 H461 L455 461
+             L304 611 H3 L0 307 Z"/>
+  </symbol>
+</svg>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="logo"><svg viewBox="0 0 1530 611"><use href="#abx"/></svg></a>
+  <div class="nav-mid">
+    <a href="#">회사소개</a>
+    <a href="#">사업영역</a>
+    <a href="#">제품정보</a>
+    <a href="#">고객소통</a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-pill">KOR +</button>
+    <a href="#cta" class="nav-cta">문의하기 <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero snap" id="hero">
+  <div class="hero-track" id="heroTrack">
+      <div class="hslide on" data-i="0">
+        <div class="hs-bg"><video muted loop playsinline preload="auto" autoplay
+          poster="assets/hero-1-poster.jpg"
+          src="assets/hero-1.mp4"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55;filter:saturate(.65) brightness(.85) contrast(1.05)"></video>
+      <svg viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+        <!-- 원근선 오버레이 (영상 위 계측 언어) -->
+        <g stroke="#00E85E" stroke-width=".5" opacity=".22">
+          <path d="M700 340 L-90 810"/><path d="M700 340 L400 810"/>
+          <path d="M700 340 L1000 810"/><path d="M700 340 L1490 810"/>
+        </g>
+        <path d="M0 340H1400" stroke="#00E85E" stroke-width=".8" opacity=".3"/>
+        <circle cx="700" cy="340" r="4" fill="#00E85E" opacity=".85"/>
+        <circle cx="700" cy="340" r="14" fill="none" stroke="#00E85E" stroke-width=".6" opacity=".4"/>
+      </svg></div>
+        <div class="hs-scrim"></div>
+        <div class="hs-inner">
+          <div class="hero-label">AIBOX</div>
+          <h1 class="hero-h">더 좋은 열매를 위한<br><em>가장 똑똑한 기술</em></h1>
+          <p class="hero-sub">나노소재와 AI 기술로 농업의 재료를 다시 만듭니다.</p>
+        </div>
+      </div>
+      <div class="hslide" data-i="1">
+        <div class="hs-bg"><video muted loop playsinline preload="auto"
+          poster="assets/hero-2-poster.jpg"
+          src="assets/hero-2.mp4"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.78;filter:saturate(.75) brightness(.98) contrast(1.02)"></video>
+      <svg viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+        <g stroke="#00E85E" stroke-width=".7" opacity=".35">
+          <path d="M1082 232 h-14 M1082 232 h14 M1082 232 v-14 M1082 232 v14"/>
+          <path d="M844 470 h-13 M844 470 h13 M844 470 v-13 M844 470 v13"/>
+          <circle cx="1082" cy="232" r="24" opacity=".3"/><circle cx="844" cy="470" r="20" opacity=".3"/>
+        </g>
+      </svg></div>
+        <div class="hs-scrim"></div>
+        <div class="hs-inner">
+          <div class="hero-label">Beyond Agriculture</div>
+          <h1 class="hero-h">농업 그 너머,<br><em>미래로</em></h1>
+          <p class="hero-sub">흙과 비료, 농약에 기대어 온 농업을 나노·바이오 소재로 다시 씁니다.</p>
+        </div>
+      </div>
+      <div class="hslide" data-i="2">
+        <div class="hs-bg"><svg viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+        <rect width="1400" height="800" fill="#F0EEE8"/>
+        <path d="M0 460H1400" stroke="#00E85E" stroke-width="1" opacity=".28"/>
+        <g stroke="#fff" stroke-width=".5" opacity=".06"><path d="M0 510H1400 M0 580H1400 M0 670H1400"/></g>
+        <g fill="#00E85E" opacity=".45">
+          <circle cx="460" cy="220" r="4"/><circle cx="700" cy="160" r="5.4"/>
+          <circle cx="940" cy="260" r="3.8"/><circle cx="580" cy="300" r="3.2"/>
+          <circle cx="810" cy="190" r="3"/><circle cx="340" cy="280" r="2.6"/>
+        </g>
+        <g stroke="#fff" stroke-width="1" fill="none" opacity=".12" stroke-linecap="round">
+          <path d="M700 460V300"/>
+          <path d="M700 360C660 340 620 336 592 344"/>
+          <path d="M700 320C742 298 786 296 814 304"/>
+        </g>
+        <g fill="#00E85E" opacity=".22">
+          <circle cx="592" cy="344" r="18"/><circle cx="814" cy="304" r="22"/>
+          <circle cx="700" cy="295" r="14"/>
+        </g>
+        <g stroke="#fff" stroke-width=".8" fill="none" opacity=".1" stroke-linecap="round">
+          <path d="M700 460V610"/>
+          <path d="M700 520C630 550 560 580 470 608"/>
+          <path d="M700 550C776 582 858 596 950 610"/>
+          <path d="M700 590C660 640 620 670 556 696"/>
+          <path d="M700 600C748 646 800 672 862 690"/>
+        </g>
+        <g fill="#00E85E" opacity=".5">
+          <circle cx="470" cy="608" r="3.6"/><circle cx="950" cy="610" r="4"/>
+          <circle cx="556" cy="696" r="3.2"/><circle cx="862" cy="690" r="3.4"/>
+        </g>
+      </svg></div>
+        <div class="hs-scrim"></div>
+        <div class="hs-inner">
+          <div class="hero-label">Less Input, More Yield</div>
+          <h1 class="hero-h">덜 넣고,<br><em>더 거둡니다</em></h1>
+          <p class="hero-sub">비료와 농약은 절반으로. 수확량과 품질은 그 이상으로.</p>
+        </div>
+      </div>
+      <div class="hslide" data-i="3">
+        <div class="hs-bg"><svg viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+        <rect width="1400" height="800" fill="#F0EEE8"/>
+        <g stroke="#00A843" stroke-width=".4" opacity=".15">
+          <path d="M0 100H1400M0 200H1400M0 300H1400M0 400H1400M0 500H1400M0 600H1400M0 700H1400"/>
+          <path d="M140 0V800M280 0V800M420 0V800M560 0V800M700 0V800M840 0V800M980 0V800M1120 0V800M1260 0V800"/>
+        </g>
+        <g fill="#00E85E" opacity=".55">
+          <circle cx="560" cy="300" r="5"/><circle cx="840" cy="500" r="4"/>
+          <circle cx="1120" cy="200" r="5.5"/><circle cx="280" cy="600" r="3.8"/>
+          <circle cx="700" cy="400" r="6"/><circle cx="420" cy="200" r="3.4"/>
+          <circle cx="980" cy="400" r="4.2"/><circle cx="1260" cy="600" r="3"/>
+          <circle cx="140" cy="300" r="3.2"/>
+        </g>
+        <g stroke="#00E85E" stroke-width=".7" fill="none" opacity=".3">
+          <path d="M560 300 L700 400 L840 500"/>
+          <path d="M700 400 L1120 200"/><path d="M700 400 L980 400"/>
+          <path d="M280 600 L560 300"/><path d="M420 200 L560 300"/>
+          <path d="M980 400 L1120 200"/><path d="M840 500 L1260 600"/>
+          <path d="M140 300 L280 600" stroke-dasharray="4 8"/>
+          <path d="M420 200 L140 300" stroke-dasharray="4 8"/>
+        </g>
+        <g stroke="#00E85E" stroke-width=".5" fill="none" opacity=".15">
+          <circle cx="700" cy="400" r="24"/><circle cx="700" cy="400" r="48" stroke-dasharray="2 8"/>
+        </g>
+      </svg></div>
+        <div class="hs-scrim"></div>
+        <div class="hs-inner">
+          <div class="hero-label">AI + Data</div>
+          <h1 class="hero-h">20년의 데이터가<br><em>재배를 판단합니다</em></h1>
+          <p class="hero-sub">식물생리 데이터 기반 처방으로 숙련도에 기대지 않는 농업을 만듭니다.</p>
+        </div>
+      </div>
+  </div>
+  <div class="hero-bar">
+    <div class="hero-nav" id="heroNav">
+        <button class="hn" data-go="0"><span class="hn-bar"><i></i></span><span class="hn-label">01 비전</span></button>
+        <button class="hn" data-go="1"><span class="hn-bar"><i></i></span><span class="hn-label">02 기술</span></button>
+        <button class="hn" data-go="2"><span class="hn-bar"><i></i></span><span class="hn-label">03 결과</span></button>
+        <button class="hn" data-go="3"><span class="hn-bar"><i></i></span><span class="hn-label">04 데이터</span></button>
+        </div>
+    <div class="hero-scroll">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      SCROLL
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section class="perf snap" id="perf">
+  <div class="perf-bg" aria-hidden="true">
+    <svg viewBox="0 0 1400 500" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pbgGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#00E85E" stop-opacity=".08"/>
+          <stop offset="1" stop-color="#00E85E" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g class="pbg-grid">
+        <path d="M0 100H1400M0 200H1400M0 300H1400M0 400H1400"/>
+      </g>
+      <path class="pbg-fill" d="M0 420 C160 400 250 340 400 300 C520 268 620 300 720 300 C820 300 900 268 1000 220 C1140 155 1260 100 1400 60 L1400 500 L0 500 Z"/>
+      <path class="pbg-line pbg-line-draw" d="M0 420 C160 400 250 340 400 300 C520 268 620 300 720 300 C820 300 900 268 1000 220 C1140 155 1260 100 1400 60"/>
+      <circle class="pbg-halo" cx="0" cy="0"/>
+      <circle class="pbg-dot" cx="0" cy="0"/>
+    </svg>
+  </div>
+  <div class="wrap">
+    <div class="perf-label rv">Performance</div>
+    <div class="perf-body rv rv-d1">
+        <h2 class="rv rv-d1">Over a decade helping early-stage businesses grow.</h2>
+        <p>에이아이박스는 더 완벽한 결실을 위해,<br>
+          최신 AI기술을 도입하여 농업의 미래를 그리고 있습니다.</p>
+    </div>
+
+    <div class="perf-nums rv rv-d2">
+      <div>
+        <div class="pn-val"><span class="cnt" data-to="3000">0</span>+</div>
+        <div class="pn-label">누적 컨설팅 농가</div>
+      </div>
+      <div>
+        <div class="pn-val"><span class="cnt" data-to="130">0</span>+</div>
+        <div class="pn-label">연평균 성장률</div>
+      </div>
+      <div>
+        <div class="pn-val"><span class="cnt" data-to="20">0</span>년+</div>
+        <div class="pn-label">대표 현장 경력</div>
+      </div>
+    </div>
+
+    <div class="partners rv rv-d3">
+      <div class="p-row"><div class="p-belt"><div class="p-card">농협</div><div class="p-card">Post AI</div><div class="p-card">Quantum Nature</div><div class="p-card">고령군</div><div class="p-card">HKCHEM</div><div class="p-card">고려대학교</div><div class="p-card">Fire Crew</div><div class="p-card">농협</div><div class="p-card">Post AI</div><div class="p-card">Quantum Nature</div><div class="p-card">고령군</div><div class="p-card">HKCHEM</div><div class="p-card">고려대학교</div><div class="p-card">Fire Crew</div></div></div>
+      <div class="p-row"><div class="p-belt"><div class="p-card">성주군</div><div class="p-card">T-CHEM</div><div class="p-card">DOBICO</div><div class="p-card">경북대학교</div><div class="p-card">한국화학연구원</div><div class="p-card">KOALA</div><div class="p-card">NANO CHEM</div><div class="p-card">성주군</div><div class="p-card">T-CHEM</div><div class="p-card">DOBICO</div><div class="p-card">경북대학교</div><div class="p-card">한국화학연구원</div><div class="p-card">KOALA</div><div class="p-card">NANO CHEM</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS & SOLUTIONS -->
+<section class="products snap" id="products">
+  <div class="wrap">
+    <div class="prod-label rv">Products & Solutions</div>
+    <p class="prod-desc rv rv-d1">에이아이박스는 더 완벽한 결실을 위해,<br>
+      최신 AI기술을 도입하여 농업의 미래를 그리고 있습니다.</p>
+
+    <div class="prod-tabs rv rv-d2">
+      <button class="ptab on">스마트팜</button>
+      <button class="ptab">재배솔루션</button>
+      <button class="ptab">농자재</button>
+      <button class="ptab">과일유통</button>
+    </div>
+
+    <div class="prod-grid rv rv-d3">
+      <div class="pcard">
+        <div class="pcard-img">
+          <img src="assets/greenhouse.jpg" alt="식물공장" style="width:100%;height:100%;object-fit:cover;display:block">
+        </div>
+        <div class="pcard-info"><div class="pcard-name">식물공장</div><div class="pcard-sub">Vertical Farm</div></div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-img">
+          <img src="assets/vertical-farm.jpg" alt="온실 스마트팜" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block">
+        </div>
+        <div class="pcard-info"><div class="pcard-name">온실 스마트팜</div><div class="pcard-sub">Greenhouse</div></div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-img">
+          <img src="assets/hydroponic.jpg" alt="수경재배" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block">
+        </div>
+        <div class="pcard-info"><div class="pcard-name">수경재배</div><div class="pcard-sub">Hydroponics</div></div>
+      </div>
+      <div class="pcard">
+        <div class="pcard-img">
+          <img src="assets/container.jpg" alt="컨테이너팜" style="width:100%;height:100%;object-fit:cover;object-position:left center;display:block">
+        </div>
+        <div class="pcard-info"><div class="pcard-name">컨테이너팜</div><div class="pcard-sub">Container Farm</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENTS -->
+<section class="contents snap" id="contents">
+  <div class="wrap">
+    <div class="cont-label rv">Contents</div>
+    <p class="cont-desc rv rv-d1">에이아이박스는 더 완벽한 결실을 위해,<br>
+      최신 AI기술을 도입하여 농업의 미래를 그리고 있습니다.</p>
+    <div class="cont-pills rv rv-d2">
+      <button class="cont-pill">AI농업</button>
+      <button class="cont-pill">스마트팜</button>
+    </div>
+
+    <div class="cont-visual rv rv-d3">
+      <div class="cont-circle"></div>
+      <button class="slide-btn slide-btn-prev" id="thumbPrev" aria-label="이전 영상">
+        <svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg>
+      </button>
+      <button class="slide-btn slide-btn-next" id="thumbNext" aria-label="다음 영상">
+        <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+      <div class="cont-visual-mask">
+        <div class="thumb-belt" id="thumbBelt">
+          <a class="thumb" href="https://www.youtube.com/watch?v=OOiPUtX3tw0" target="_blank" rel="noopener">
+          <div class="thumb-bg"><img src="https://i.ytimg.com/vi/OOiPUtX3tw0/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="thumb-top">
+            <div class="thumb-avatar">농</div>
+            <div class="thumb-title">농사천국</div>
+          </div>
+          <div class="thumb-play"></div>
+        </a>
+          <a class="thumb" href="https://www.youtube.com/watch?v=h_5QVik9B3A" target="_blank" rel="noopener">
+          <div class="thumb-bg"><img src="https://i.ytimg.com/vi/h_5QVik9B3A/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="thumb-top">
+            <div class="thumb-avatar">농</div>
+            <div class="thumb-title">농사천국</div>
+          </div>
+          <div class="thumb-play"></div>
+        </a>
+          <a class="thumb" href="https://www.youtube.com/watch?v=1Wnf01hb-N8" target="_blank" rel="noopener">
+          <div class="thumb-bg"><img src="https://i.ytimg.com/vi/1Wnf01hb-N8/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="thumb-top">
+            <div class="thumb-avatar">농</div>
+            <div class="thumb-title">농사천국</div>
+          </div>
+          <div class="thumb-play"></div>
+        </a>
+          <a class="thumb" href="https://www.youtube.com/watch?v=aSybmY-L0ik" target="_blank" rel="noopener">
+          <div class="thumb-bg"><img src="https://i.ytimg.com/vi/aSybmY-L0ik/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="thumb-top">
+            <div class="thumb-avatar">농</div>
+            <div class="thumb-title">농사천국</div>
+          </div>
+          <div class="thumb-play"></div>
+        </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="bcta snap" id="cta">
+  <div class="wrap">
+    <h2 class="bcta-title rv">CONTENTS</h2>
+    <p class="bcta-desc rv rv-d1">에이아이박스는 더 완벽한 결실을 위해,<br>
+      최신 AI기술을 도입하여 농업의 미래를 그리고 있습니다.</p>
+
+    <div class="bcta-cards rv rv-d2">
+      <div class="bcta-card">투자 문의</div>
+      <div class="bcta-card">사업 협력</div>
+      <div class="bcta-card">채용 공고</div>
+    </div>
+
+    <button class="bcta-btn rv rv-d3">
+      문의하기 <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="foot-copy">© 2026 AIBOX. All rights reserved.</div>
+  <div class="foot-links">
+    <a href="#">회사소개</a><a href="#">사업영역</a><a href="#">제품정보</a>
+    <a href="#">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nav = document.getElementById('nav');
+
+  /* reveal */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }});
+  }, {threshold:.15, rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  /* nav */
+  window.addEventListener('scroll', function(){
+    if(nav) nav.classList.toggle('stuck', window.scrollY > 40);
+  }, {passive:true});
+
+  /* hero slider — 좌우 슬라이드 */
+  (function(){
+    var track = document.getElementById('heroTrack');
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.hslide'));
+    var btns = Array.prototype.slice.call(document.querySelectorAll('.hn'));
+    if(!slides.length) return;
+    var DUR = 5600, idx = 0, timer = null;
+
+    function go(i){
+      idx = i;
+      track.style.transform = 'translate3d(-' + (i*25) + '%,0,0)';
+      slides.forEach(function(s,n){
+        s.classList.toggle('on', n===i);
+        var v = s.querySelector('video');
+        if(v){ if(n===i){ var pr=v.play(); if(pr&&pr.catch) pr.catch(function(){}); } else { v.pause(); } }
+      });
+      btns.forEach(function(b,n){
+        b.classList.toggle('on', n===i);
+        var bar = b.querySelector('i');
+        bar.style.transition = 'none';
+        bar.style.width = '0%';
+        if(n===i && !reduce){
+          void bar.offsetWidth;
+          bar.style.transition = 'width ' + DUR + 'ms linear';
+          bar.style.width = '100%';
+        } else if(n===i){ bar.style.width = '100%'; }
+      });
+    }
+    function next(){ go((idx+1) % slides.length); }
+    function play(){ clearInterval(timer); timer = setInterval(next, DUR); }
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){ go(+b.dataset.go); play(); });
+    });
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden) clearInterval(timer); else play();
+    });
+    go(0); play();
+  })();
+
+  /* tabs */
+  document.querySelectorAll('.ptab').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.ptab').forEach(function(t){ t.classList.remove('on'); });
+      b.classList.add('on');
+    });
+  });
+
+  /* counters */
+  var cio = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target, to = +el.dataset.to, t0 = null, dur = 1400;
+      if(reduce){ el.textContent = to.toLocaleString(); cio.unobserve(el); return; }
+      function step(t){
+        if(!t0) t0 = t;
+        var p = Math.min((t-t0)/dur, 1);
+        el.textContent = Math.round(to * (1 - Math.pow(1-p,3))).toLocaleString();
+        if(p<1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+      cio.unobserve(el);
+    });
+  }, {threshold:.6});
+  document.querySelectorAll('.cnt').forEach(function(el){ cio.observe(el); });
+
+
+  /* 유튜브 썸네일 수동 슬라이더 */
+  (function(){
+    var belt = document.getElementById('thumbBelt');
+    var prev = document.getElementById('thumbPrev');
+    var next = document.getElementById('thumbNext');
+    if(!belt || !prev || !next) return;
+    function step(){
+      var card = belt.querySelector('.thumb');
+      if(!card) return 300;
+      var s = getComputedStyle(belt);
+      var gap = parseFloat(s.columnGap || s.gap || 20);
+      return card.getBoundingClientRect().width + gap;
+    }
+    function update(){
+      var max = belt.scrollWidth - belt.clientWidth - 2;
+      prev.disabled = belt.scrollLeft <= 2;
+      next.disabled = belt.scrollLeft >= max;
+    }
+    prev.addEventListener('click', function(){ belt.scrollBy({left:-step(),behavior:'smooth'}); });
+    next.addEventListener('click', function(){ belt.scrollBy({left: step(),behavior:'smooth'}); });
+    belt.addEventListener('scroll', update, {passive:true});
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+
+  /* 우측 섹션 네비게이션 */
+  (function(){
+    var nav = document.getElementById('secNav');
+    if(!nav) return;
+    var items = Array.prototype.slice.call(nav.querySelectorAll('.sn-item'));
+    var map = {};
+    items.forEach(function(a){
+      var id = a.dataset.target;
+      var sec = document.getElementById(id);
+      if(sec) map[id] = {sec:sec, item:a};
+    });
+    setTimeout(function(){ nav.classList.add('ready'); }, 400);
+
+    function pick(){
+      var mid = window.innerHeight/2;
+      var best = null, bestDist = Infinity;
+      for(var id in map){
+        var r = map[id].sec.getBoundingClientRect();
+        var c = (r.top + r.bottom)/2;
+        var d = Math.abs(c - mid);
+        if(d < bestDist){ bestDist = d; best = id; }
+      }
+      items.forEach(function(a){
+        a.classList.toggle('on', a.dataset.target === best);
+      });
+    }
+    window.addEventListener('scroll', pick, {passive:true});
+    window.addEventListener('resize', pick);
+    pick();
+  })();
+
+  /* perf 배경 라인차트 트리거 */
+  var perfSec = document.getElementById('perf');
+  if(perfSec){
+    var pio = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        perfSec.classList.toggle('in-view', e.isIntersecting);
+      });
+    }, {threshold:.35});
+    pio.observe(perfSec);
+  }
+})();
+</script>
+</body>
+</html>
