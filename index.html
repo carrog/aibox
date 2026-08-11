@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AIBOX — 홈페이지 리뉴얼 시안 선택</title>
+<title>AIBOX — 홈페이지 시안</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -25,6 +25,7 @@
 body{background:var(--bg);color:var(--white);font-family:var(--f-kr);font-weight:400;
   -webkit-font-smoothing:antialiased;min-height:100vh;
   display:flex;flex-direction:column;overflow-x:hidden}
+body.intro-active{overflow:hidden}
 ::selection{background:var(--green);color:var(--bg)}
 a{color:inherit;text-decoration:none}
 
@@ -33,29 +34,91 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
   opacity:.04;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-.hd{padding:36px clamp(20px,5vw,60px) 0;
-  display:flex;justify-content:space-between;align-items:center}
+/* =====================  INTRO  ===================== */
+#intro{position:fixed;inset:0;z-index:600;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .75s var(--ease),visibility .75s}
+#intro.done{opacity:0;visibility:hidden;pointer-events:none}
+.intro-stage{position:relative;width:min(62vw,660px)}
+.intro-logo{display:block;width:100%;overflow:visible}
+
+/* 컨테이너 1개 = 온전한 육각형. 3개가 겹쳐 합쳐지면 로고 실루엣이 된다.
+   그리기(stroke-dash) 없이 완성된 형태로 뒤에서 날아와 자리를 잡는다. */
+.ctn{
+  fill:transparent;
+  stroke:var(--white);stroke-width:4;
+  stroke-linejoin:round;stroke-linecap:round;
+  transform-box:fill-box;transform-origin:center;
+  opacity:0;
+  transition:opacity .7s var(--ease),
+             transform 1.15s cubic-bezier(.22,.9,.24,1),
+             fill .75s var(--ease);
+}
+/* 대기 위치 — 뒤(작게)에서 좌우로 벌어져 있다 */
+.ctn-2{transform:translate(330px,54px) scale(.8)}
+.ctn-1{transform:translate(0,54px) scale(.8)}
+.ctn-0{transform:translate(-330px,54px) scale(.8)}
+
+/* 뒤에서부터(ctn-2 → ctn-1 → ctn-0) 차례로 나와 제자리로 합쳐진다 */
+#intro.assemble .ctn{opacity:1;transform:none}
+#intro.assemble .ctn-2{transition-delay:0s}
+#intro.assemble .ctn-1{transition-delay:.2s}
+#intro.assemble .ctn-0{transition-delay:.4s}
+
+/* 합쳐진 뒤 왼쪽부터 흰색으로 채워진다 */
+#intro.fill .ctn{fill:var(--white)}
+#intro.fill .ctn-0{transition-delay:0s,0s,0s}
+#intro.fill .ctn-1{transition-delay:0s,0s,.13s}
+#intro.fill .ctn-2{transition-delay:0s,0s,.26s}
+#intro.exit .intro-stage{transform:scale(.88);opacity:0;
+  transition:transform .8s cubic-bezier(.6,.02,.2,1),opacity .7s var(--ease)}
+.intro-word{text-align:center;margin-top:clamp(16px,3vw,32px);
+  font-family:var(--f-en);font-size:clamp(14px,2.6vw,28px);font-weight:200;
+  letter-spacing:1.1em;text-indent:1.1em;color:var(--white);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .7s var(--ease),letter-spacing .9s var(--ease),
+             text-indent .9s var(--ease),transform .7s var(--ease)}
+#intro.word .intro-word{opacity:1;letter-spacing:.6em;text-indent:.6em;transform:none}
+.intro-skip{position:absolute;left:0;right:0;bottom:8vh;text-align:center;
+  font-family:var(--f-en);font-size:10px;letter-spacing:.22em;
+  color:var(--edge);text-transform:uppercase;
+  opacity:0;transition:opacity .5s .8s}
+#intro.word .intro-skip{opacity:1}
+
+/* 모션을 줄이는 환경 — 이동·확대는 없애고 등장/채움만 즉시 전환으로 남긴다.
+   대기 시간은 스크립트에서 함께 줄인다. */
+@media(prefers-reduced-motion:reduce){
+  .ctn{transition-duration:.01s !important;transition-delay:0s !important}
+  .ctn-0,.ctn-1,.ctn-2{transform:none}
+  .intro-word,.intro-skip,#intro{transition-duration:.01s !important}
+  .intro-skip{transition-delay:0s !important}
+  #intro.exit .intro-stage{transform:none;transition-duration:.01s !important}
+}
+
+.hd{padding:clamp(18px,3vh,32px) clamp(20px,5vw,60px) 0;
+  display:flex;justify-content:space-between;align-items:center;flex:none}
 .brand{display:flex;align-items:center;gap:11px;font-family:var(--f-en);
   font-weight:600;font-size:16px;letter-spacing:.16em}
 .brand svg{height:22px;fill:var(--white)}
 .hd-meta{font-family:var(--f-en);font-size:12px;letter-spacing:.16em;
   color:var(--mute);text-transform:uppercase}
 
-main{flex:1;padding:clamp(60px,10vh,120px) clamp(20px,5vw,60px) 40px;
-  max-width:1440px;margin:0 auto;width:100%}
+main{flex:1;min-height:0;
+  padding:clamp(26px,5vh,64px) clamp(20px,5vw,60px) clamp(18px,3vh,32px);
+  max-width:1440px;margin:0 auto;width:100%;
+  display:flex;flex-direction:column}
 
-.intro{max-width:640px;margin-bottom:clamp(60px,9vh,100px)}
+.intro{flex:none;margin-bottom:clamp(18px,3.2vh,40px)}
 .eyebrow{display:inline-flex;align-items:center;gap:12px;
   font-family:var(--f-en);font-size:12px;font-weight:500;
-  letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:24px}
+  letter-spacing:.2em;color:var(--green);text-transform:uppercase;
+  margin-bottom:clamp(10px,1.6vh,18px)}
 .eyebrow::before{content:"";width:32px;height:1px;background:var(--green)}
-h1{font-family:var(--f-en);font-size:clamp(42px,6vw,72px);font-weight:100;
-  line-height:1.08;letter-spacing:-.035em;margin-bottom:24px}
+h1{font-family:var(--f-en);font-size:clamp(30px,4.4vw,58px);font-weight:100;
+  line-height:1.08;letter-spacing:-.035em}
 h1 em{font-style:normal;font-weight:400;color:var(--green)}
-.lede{font-size:16px;line-height:1.8;color:var(--mute);max-width:56ch}
-.lede strong{font-weight:500;color:var(--light)}
 
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.5vw,22px)}
 
 .card{position:relative;background:var(--card);border:1px solid var(--edge);
   border-radius:16px;overflow:hidden;display:flex;flex-direction:column;
@@ -77,18 +140,17 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
 .badge-live{background:var(--green);color:#000}
 .badge-wip{background:var(--card);color:var(--mute);border:1px solid var(--edge)}
 
-.body{padding:clamp(24px,3vw,32px);flex:1;
+.body{padding:clamp(16px,1.8vw,26px);flex:1;
   display:flex;flex-direction:column;justify-content:space-between}
-.body h2{font-size:clamp(22px,2.2vw,28px);font-weight:500;line-height:1.3;
-  letter-spacing:-.02em;margin-bottom:10px}
+.body h2{font-size:clamp(18px,1.7vw,24px);font-weight:500;line-height:1.3;
+  letter-spacing:-.02em;margin-bottom:clamp(10px,1.5vh,16px)}
 .body h2 span{color:var(--mute);font-weight:300}
-.body p{font-size:14px;line-height:1.7;color:var(--mute);margin-bottom:22px}
-.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:clamp(12px,2vh,20px)}
 .tag{font-family:var(--f-en);font-size:10px;font-weight:500;letter-spacing:.1em;
   text-transform:uppercase;padding:5px 10px;border:1px solid var(--edge);
   border-radius:12px;color:var(--light)}
 .enter{display:flex;align-items:center;justify-content:space-between;
-  padding-top:18px;border-top:1px solid var(--edge);margin-top:auto}
+  padding-top:clamp(12px,1.6vh,16px);border-top:1px solid var(--edge);margin-top:auto}
 .enter-text{font-family:var(--f-en);font-size:12px;font-weight:600;letter-spacing:.14em;
   text-transform:uppercase;color:var(--white)}
 .enter-text.mute{color:var(--mute)}
@@ -101,10 +163,11 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
 .card:not(.wip):hover .arrow svg{stroke:#000}
 .card:not(.wip):hover .arrow{transform:translateX(4px)}
 
-.subpages{margin-top:clamp(50px,7vh,80px);
-  border-top:1px solid var(--edge);padding-top:clamp(30px,5vh,50px)}
+.subpages{flex:none;margin-top:clamp(16px,2.6vh,32px);
+  border-top:1px solid var(--edge);padding-top:clamp(14px,2.2vh,26px);
+  display:flex;align-items:center;gap:clamp(14px,2vw,26px);flex-wrap:wrap}
 .sub-title{font-family:var(--f-en);font-size:11px;font-weight:600;letter-spacing:.2em;
-  color:var(--mute);text-transform:uppercase;margin-bottom:20px}
+  color:var(--mute);text-transform:uppercase}
 .sub-list{display:flex;gap:12px;flex-wrap:wrap}
 .sub-link{padding:10px 18px;border:1px solid var(--edge);border-radius:24px;
   font-size:13px;color:var(--light);display:inline-flex;align-items:center;gap:8px;
@@ -112,17 +175,42 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
 .sub-link:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px)}
 .sub-link svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
 
-.foot{padding:24px clamp(20px,5vw,60px);border-top:1px solid var(--edge);
+.foot{flex:none;padding:clamp(13px,2vh,20px) clamp(20px,5vw,60px);border-top:1px solid var(--edge);
   display:flex;justify-content:space-between;align-items:center;
   font-family:var(--f-en);font-size:11px;letter-spacing:.1em;color:var(--mute);
   text-transform:uppercase;flex-wrap:wrap;gap:10px}
 
-@media(max-width:900px){
+@media(max-width:1240px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){
   .grid{grid-template-columns:1fr;max-width:520px;margin:0 auto}
+}
+
+/* 화면이 4장을 한 줄로 받을 만큼 크면 스크롤 없이 한 화면에 가둔다.
+   카드를 세로로 늘리지는 않는다 — 미리보기가 16:10을 벗어나면 시안이 과하게 잘린다.
+   남는 높이는 여백으로 두고 카드를 가운데에 세운다.
+   좁거나 낮은 화면에서는 평범한 스크롤 문서로 되돌아간다. */
+@media(min-width:1241px) and (min-height:700px){
+  body{height:100svh;overflow:hidden}
+  .grid{flex:1;min-height:0;align-content:center}
 }
 </style>
 </head>
-<body>
+<body class="intro-active">
+
+<!-- ===== INTRO ===== -->
+<div id="intro">
+  <div class="intro-stage">
+    <!-- 동일한 육각 컨테이너 3개. 그리는 순서가 곧 앞뒤 관계 —
+         ctn-2가 가장 뒤, ctn-0이 가장 앞. 셋이 겹치면 로고 실루엣이 나온다. -->
+    <svg class="intro-logo" viewBox="0 0 1530 611">
+      <path class="ctn ctn-2" d="M1227 0 H1528 L1530 305 L1224 611 H922 L919 307 Z"/>
+      <path class="ctn ctn-1" d="M765 0 H1069 L1071 305 L763 611 H461 L458 307 Z"/>
+      <path class="ctn ctn-0" d="M304 0 H609 L611 305 L304 611 H3 L0 307 Z"/>
+    </svg>
+    <div class="intro-word">AIBOX</div>
+  </div>
+  <div class="intro-skip">click to skip</div>
+</div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="abx" viewBox="0 0 1530 611">
@@ -143,9 +231,7 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
 <main>
   <div class="intro">
     <div class="eyebrow">Design Drafts</div>
-    <h1>홈페이지 리뉴얼<br><em>시안 선택</em></h1>
-    <p class="lede">AIBOX 홈페이지 리뉴얼을 위한 <strong>디자인 시안</strong>입니다.
-      각 시안은 서로 다른 톤과 구성을 제안하며, 카드를 클릭하면 전체 화면으로 확인할 수 있습니다.</p>
+    <h1>홈페이지 <em>시안</em></h1>
   </div>
 
   <div class="grid">
@@ -182,8 +268,6 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
       <div class="body">
         <div>
           <h2>시안 1 <span>· 산화철 앰버</span></h2>
-          <p>깊이 있는 다크 톤에 산화철·녹청·골드 3색 액센트.
-            스크롤 스크럽 애니메이션과 계측 언어 중심의 절제된 디자인.</p>
           <div class="tags">
             <span class="tag">Dark</span>
             <span class="tag">Scroll Scrub</span>
@@ -228,8 +312,6 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
       <div class="body">
         <div>
           <h2>시안 2 <span>· Black</span></h2>
-          <p>순수한 블랙 배경에 네온 그린 액센트.
-            섹션 스냅 스크롤과 우측 네비게이션, 실사 이미지 중심의 대담한 구성.</p>
           <div class="tags">
             <span class="tag">Black</span>
             <span class="tag">Neon Green</span>
@@ -273,13 +355,59 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
       <div class="body">
         <div>
           <h2>시안 2 <span>· White</span></h2>
-          <p>시안 2의 White 반전 버전. 종이 톤의 웜 오프화이트 배경에
-            딥 그린 액센트. 밝고 신뢰감 있는 톤.</p>
           <div class="tags">
             <span class="tag">White</span>
             <span class="tag">Deep Green</span>
             <span class="tag">Warm</span>
             <span class="tag">Same Structure</span>
+          </div>
+        </div>
+        <div class="enter">
+          <span class="enter-text">View Draft →</span>
+          <div class="arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        </div>
+      </div>
+    </a>
+
+    <!-- 시안 3 -->
+    <a class="card" href="draft-3/">
+      <div class="preview">
+        <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
+          <rect width="400" height="250" fill="#F4F6F3"/>
+          <!-- 우측 판형 -->
+          <rect x="232" y="0" width="168" height="250" fill="#E9ECE7"/>
+          <path d="M232 0V250" stroke="#D2D8D1" stroke-width="1"/>
+          <g stroke="#0F1512" stroke-width=".5" opacity=".1">
+            <path d="M232 62H400M232 125H400M232 188H400"/>
+            <path d="M274 0V250M316 0V250M358 0V250"/>
+          </g>
+          <path d="M244 198 C270 186 286 152 312 138 C340 122 362 96 392 72"
+                stroke="#1B6E3C" stroke-width="1.6" fill="none" opacity=".9"/>
+          <g fill="#1B6E3C"><circle cx="312" cy="138" r="3"/><circle cx="392" cy="72" r="3.4"/></g>
+          <!-- 좌측 카피 -->
+          <path d="M24 95H44" stroke="#1B6E3C" stroke-width="1.4"/>
+          <text x="52" y="99" font-family="Inter,sans-serif" font-size="8" font-weight="600"
+                fill="#1B6E3C" letter-spacing="1.8">BEYOND AGRICULTURE</text>
+          <text x="24" y="140" font-family="Noto Sans KR,sans-serif" font-size="24"
+                font-weight="300" fill="#0F1512" letter-spacing="-.9">농업 그 너머,</text>
+          <text x="24" y="174" font-family="Noto Sans KR,sans-serif" font-size="24"
+                font-weight="500" fill="#1B6E3C" letter-spacing="-.9">미래로</text>
+          <g stroke="#D2D8D1" stroke-width="1.6">
+            <path d="M80 210H124M136 210H180"/>
+          </g>
+          <path d="M24 210H68" stroke="#1B6E3C" stroke-width="1.6"/>
+        </svg>
+        <div class="preview-label" style="background:rgba(255,255,255,.85);color:#0F1512">DRAFT 03</div>
+        <div class="preview-badge badge-live">LIVE</div>
+      </div>
+      <div class="body">
+        <div>
+          <h2>시안 3 <span>· 에디토리얼</span></h2>
+          <div class="tags">
+            <span class="tag">Off-White</span>
+            <span class="tag">Deep Forest</span>
+            <span class="tag">Light Gothic</span>
+            <span class="tag">Editorial Grid</span>
           </div>
         </div>
         <div class="enter">
@@ -307,5 +435,35 @@ h1 em{font-style:normal;font-weight:400;color:var(--green)}
   <div>Prepared by Bytelabs</div>
 </footer>
 
+<script>
+(function(){
+  var intro = document.getElementById('intro');
+
+  /* 모션을 줄이는 환경에서는 전환이 즉시 끝나므로, 정지 화면을 4.5초 보게 두지 않고
+     타임라인 자체를 압축한다. */
+  var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var at = calm
+    ? {assemble:60, fill:260, word:520, exit:1100}
+    : {assemble:320, fill:2150, word:3000, exit:4500};
+
+  var t1,t2,t3,t4;
+  t1 = setTimeout(function(){ intro.classList.add('assemble'); }, at.assemble);
+  t2 = setTimeout(function(){ intro.classList.add('fill'); }, at.fill);
+  t3 = setTimeout(function(){ intro.classList.add('word'); }, at.word);
+  t4 = setTimeout(function(){
+    intro.classList.add('exit');
+    setTimeout(function(){
+      intro.classList.add('done');
+      document.body.classList.remove('intro-active');
+    }, calm ? 40 : 800);
+  }, at.exit);
+
+  intro.addEventListener('click', function(){
+    clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
+    intro.classList.add('done');
+    document.body.classList.remove('intro-active');
+  });
+})();
+</script>
 </body>
 </html>

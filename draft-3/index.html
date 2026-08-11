@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIBOX — Beyond Agriculture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Noto+Sans+KR:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   AIBOX — 시안 3
+   섹션 순서·흐름은 시안 2와 동일. 디자인 언어만 교체.
+   색은 green / black / white 계열만. 서체는 고딕(그로테스크)만.
+   시안 2와의 차이는 명도(라이트)·무게(300 대 900)·격자(헤어라인 편집)에서 난다.
+   ============================================================ */
+:root{
+  --paper:   #F4F6F3;   /* 바탕 — 초록기 도는 오프화이트 */
+  --paper-2: #E9ECE7;   /* 교차 섹션 */
+  --ink:     #0F1512;   /* 본문 — 초록기 도는 블랙 */
+  --ink-2:   #5C665F;   /* 보조 */
+  --rule:    #D2D8D1;   /* 헤어라인 */
+  --green:   #1B6E3C;   /* 주 액센트 — 딥 포레스트 */
+  --green-2: #5B8C6C;   /* 보조 — 세이지 */
+
+  --f-g:"Space Grotesk","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+  --f-kr:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+
+  --pad:clamp(20px,5vw,80px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-snap-type:y proximity}
+.snap{scroll-snap-align:start;scroll-snap-stop:always;min-height:100svh}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--f-kr);font-weight:400;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  /* 한글은 어절 단위로 끊는다. 기본 글자 단위 줄바꿈은 낱말을 갈라놓는다. */
+  word-break:keep-all;overflow-wrap:break-word;
+}
+body.nav-locked{overflow:hidden}
+::selection{background:var(--green);color:var(--paper)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;width:100%}
+
+/* ---------- 타이포 ---------- */
+.num{font-family:var(--f-g);font-size:12px;font-weight:500;letter-spacing:.18em;color:var(--green)}
+.kicker{font-family:var(--f-g);font-size:12px;font-weight:500;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink-2);margin-top:8px}
+/* 시안 2가 900으로 밀어붙이는 자리를 300으로 비워 둔다 — 같은 구조, 다른 무게 */
+.h-sec{font-family:var(--f-g);font-weight:300;font-size:clamp(30px,4.4vw,58px);
+  line-height:1.18;letter-spacing:-.03em}
+.h-sec em{font-style:normal;font-weight:500;color:var(--green)}
+.lede{margin-top:18px;font-size:clamp(14.5px,1.15vw,16.5px);line-height:1.85;
+  color:var(--ink-2);max-width:52ch;font-weight:300}
+
+.sec{padding:clamp(72px,11vh,130px) var(--pad);border-top:1px solid var(--rule);
+  display:flex;align-items:center}
+.sec--alt{background:var(--paper-2)}
+.sec-head{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);
+  gap:clamp(20px,4vw,56px);align-items:start}
+.rail{position:relative;padding-top:6px}
+.rail::after{content:"";display:block;width:34px;height:1px;background:var(--green);margin-top:14px}
+@media(max-width:820px){
+  .sec-head{grid-template-columns:1fr;gap:18px}
+  .rail::after{display:none}
+}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .85s var(--ease),transform .85s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv-d1{transition-delay:.1s}.rv-d2{transition-delay:.2s}
+.rv-d3{transition-delay:.3s}.rv-d4{transition-delay:.4s}
+
+/* ========== NAV ========== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;gap:clamp(20px,4vw,48px);
+  padding:20px var(--pad);border-bottom:1px solid transparent;
+  transition:background .4s var(--ease),border-color .4s,padding .4s var(--ease)}
+.nav.stuck{background:rgba(244,246,243,.9);backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  border-bottom-color:var(--rule);padding:13px var(--pad)}
+.logo{display:flex;align-items:center;gap:10px;margin-right:auto;position:relative;z-index:2}
+.logo svg{height:24px;fill:var(--ink);transition:fill .3s}
+.logo:hover svg{fill:var(--green)}
+.logo b{font-family:var(--f-g);font-weight:600;font-size:17px;letter-spacing:.06em}
+
+/* 데스크톱에서는 래퍼가 사라지고 자식이 그대로 .nav의 flex 아이템이 된다 */
+.nav-panel{display:contents}
+.nav-mid{display:flex;gap:30px;font-family:var(--f-kr);font-size:15px;color:var(--ink-2)}
+.nav-mid a{position:relative;padding:3px 0;transition:color .3s}
+.nav-mid a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:0;
+  background:var(--green);transition:width .35s var(--ease)}
+.nav-mid a:hover{color:var(--ink)}
+.nav-mid a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:12px}
+.lang-pill{font-family:var(--f-g);font-size:12.5px;letter-spacing:.1em;color:var(--ink-2);
+  border:1px solid var(--rule);background:none;padding:9px 14px;cursor:pointer;
+  transition:.3s var(--ease)}
+.lang-pill:hover{border-color:var(--ink);color:var(--ink)}
+.nav-cta{font-family:var(--f-g);font-size:13px;font-weight:500;letter-spacing:.04em;
+  color:var(--paper);background:var(--ink);padding:11px 22px;
+  display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;
+  transition:background .3s var(--ease)}
+.nav-cta:hover{background:var(--green)}
+.nav-cta svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* 햄버거 — 데스크톱에서는 숨는다 */
+.nav-toggle{display:none;position:relative;z-index:2;width:44px;height:44px;
+  background:none;border:0;padding:0;cursor:pointer;margin-left:auto;
+  flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.nav-toggle span{display:block;width:23px;height:1.5px;background:var(--ink);
+  transition:transform .35s var(--ease),opacity .22s var(--ease)}
+.nav.menu-open .nav-toggle span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.nav.menu-open .nav-toggle span:nth-child(2){opacity:0}
+.nav.menu-open .nav-toggle span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+/* 모바일 — 로고와 햄버거만 남기고 메뉴·언어·CTA는 전면 드로어로 들어간다 */
+@media(max-width:980px){
+  .nav-toggle{display:flex}
+  .nav-panel{position:fixed;inset:0;z-index:1;
+    display:flex;flex-direction:column;
+    /* 내용이 화면보다 길면 center는 위아래로 똑같이 넘쳐 로고를 덮는다.
+       safe center는 그럴 때만 위 정렬로 물러난다. */
+    justify-content:flex-start;
+    justify-content:safe center;
+    overflow-y:auto;gap:clamp(24px,4vh,40px);
+    padding:clamp(100px,14vh,132px) var(--pad) clamp(40px,6vh,64px);
+    background:var(--paper);
+    opacity:0;visibility:hidden;transform:translateY(-10px);
+    transition:opacity .4s var(--ease),transform .45s var(--ease),visibility .45s}
+  .nav.menu-open .nav-panel{opacity:1;visibility:visible;transform:none}
+  .nav-mid{flex-direction:column;gap:0;font-size:clamp(21px,5.4vw,28px);color:var(--ink);
+    border-top:1px solid var(--rule)}
+  .nav-mid a{padding:clamp(15px,2.4vh,20px) 0;border-bottom:1px solid var(--rule)}
+  .nav-mid a::after{display:none}
+  .nav-right{flex-direction:column;align-items:stretch;gap:12px}
+  .lang-pill{padding:15px;font-size:14px}
+  .nav-cta{padding:17px;font-size:15px}
+}
+
+/* ========== 우측 섹션 네비 — 눈금자 ========== */
+/* 히어로 사진 위에도 올라가므로 페이퍼 판을 깔아 대비를 고정한다 */
+.sec-nav{position:fixed;top:50%;right:clamp(14px,2.6vw,34px);transform:translateY(-50%);
+  z-index:150;display:flex;flex-direction:column;gap:0;
+  background:rgba(244,246,243,.76);backdrop-filter:blur(9px) saturate(130%);
+  -webkit-backdrop-filter:blur(9px) saturate(130%);
+  border:1px solid rgba(210,216,209,.75);padding:8px 12px;
+  opacity:0;transition:opacity .6s .4s var(--ease);pointer-events:none}
+.sec-nav.ready{opacity:1;pointer-events:auto}
+.sn-item{position:relative;display:flex;align-items:center;justify-content:flex-end;
+  gap:10px;height:34px}
+.sn-n{font-family:var(--f-g);font-size:10px;letter-spacing:.1em;color:var(--ink-2);
+  opacity:.5;transition:opacity .35s,color .35s}
+.sn-tick{width:16px;height:1px;background:var(--ink);opacity:.32;
+  transition:width .4s var(--ease),background .35s,opacity .35s}
+.sn-item:hover .sn-tick{width:26px;opacity:.7}
+.sn-item.on .sn-tick{width:34px;background:var(--green);opacity:1}
+.sn-item.on .sn-n{opacity:1;color:var(--green)}
+.sn-label{position:absolute;right:calc(100% + 10px);white-space:nowrap;
+  font-family:var(--f-g);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink);background:var(--paper);border:1px solid var(--rule);padding:5px 10px;
+  opacity:0;transform:translateX(6px);pointer-events:none;
+  transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.sn-item:hover .sn-label{opacity:1;transform:none}
+/* 중간 너비에서는 본문 그리드와 겹친다 — 그 전에 접는다 */
+@media(max-width:1080px){.sec-nav{display:none}}
+
+/* ========== HERO — 좌 텍스트 / 우 판형 ========== */
+.hero{position:relative;min-height:100svh;display:flex;align-items:stretch;
+  padding-top:clamp(84px,11vh,120px);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,46%);
+  width:100%;align-items:stretch}
+.hero-copy{position:relative;padding:0 clamp(28px,4vw,64px) clamp(28px,4vh,52px) var(--pad);
+  display:flex;flex-direction:column;justify-content:center}
+.hero-stack{display:grid}
+/* 나가는 카피는 빠르게 물러나고, 들어오는 카피는 슬라이드마다 다른 몸짓으로 등장한다 */
+.hs-text{grid-area:1/1;opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .32s var(--ease),visibility 0s .32s}
+.hs-text.on{opacity:1;visibility:visible;pointer-events:auto;
+  transition:opacity .26s var(--ease),visibility 0s}
+.hero-label{font-family:var(--f-g);font-size:12px;font-weight:500;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--green);display:flex;align-items:center;gap:12px}
+.hero-label::before{content:"";width:26px;height:1px;background:var(--green);flex:none}
+.hero-h{margin-top:clamp(16px,2.4vh,26px);font-family:var(--f-g);font-weight:300;
+  font-size:clamp(34px,5.6vw,74px);line-height:1.14;letter-spacing:-.035em}
+.hero-h .ln{display:block}
+.hero-h em{font-style:normal;font-weight:500;color:var(--green)}
+
+/* --- 슬라이드 공통: 눈금이 그어지고 라벨·본문이 올라온다 --- */
+.hs-text.on .hero-label{animation:riseIn .75s var(--ease) .06s both}
+.hs-text.on .hero-label::before{animation:ruleIn .7s var(--ease) .2s both}
+.hs-text.on .hero-sub{animation:riseIn .8s var(--ease) .46s both}
+@keyframes riseIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes ruleIn{from{width:0;opacity:0}to{width:26px;opacity:1}}
+
+/* --- 01 비전 — 아래에서 밀어 올린다 --- */
+.hs-text[data-i="0"].on .ln:nth-child(1){animation:riseIn .9s var(--ease) .18s both}
+.hs-text[data-i="0"].on .ln:nth-child(2){animation:riseIn .9s var(--ease) .31s both}
+
+/* --- 02 기술 — 커튼이 걷히듯 아래에서 위로 열린다 --- */
+/* 끝 상태를 음수로 두어 받침·괄호가 잘리지 않게 한다 */
+@keyframes curtainIn{
+  from{opacity:0;clip-path:inset(100% 0 0 0);transform:translateY(15px)}
+  to{opacity:1;clip-path:inset(-6% -2% -6% -2%);transform:none}
+}
+.hs-text[data-i="1"].on .ln:nth-child(1){animation:curtainIn .95s cubic-bezier(.3,.72,.2,1) .18s both}
+.hs-text[data-i="1"].on .ln:nth-child(2){animation:curtainIn .95s cubic-bezier(.3,.72,.2,1) .34s both}
+
+/* --- 03 결과 — 왼쪽에서 오른쪽으로 그어진다 --- */
+@keyframes wipeIn{
+  from{opacity:0;clip-path:inset(0 100% 0 0);transform:translateX(-26px)}
+  to{opacity:1;clip-path:inset(-6% -2% -6% -2%);transform:none}
+}
+.hs-text[data-i="2"].on .ln:nth-child(1){animation:wipeIn 1s cubic-bezier(.25,.75,.2,1) .18s both}
+.hs-text[data-i="2"].on .ln:nth-child(2){animation:wipeIn 1s cubic-bezier(.25,.75,.2,1) .33s both}
+
+/* --- 04 데이터 — 흐릿한 상에서 초점이 잡힌다 --- */
+@keyframes focusIn{
+  from{opacity:0;filter:blur(14px);transform:scale(1.05)}
+  to{opacity:1;filter:blur(0);transform:none}
+}
+.hs-text[data-i="3"].on .ln:nth-child(1){animation:focusIn 1s var(--ease) .18s both}
+.hs-text[data-i="3"].on .ln:nth-child(2){animation:focusIn 1s var(--ease) .35s both}
+.hero-sub{margin-top:clamp(14px,2vh,22px);font-size:clamp(14.5px,1.2vw,17px);
+  line-height:1.85;color:var(--ink-2);max-width:40ch;font-weight:300}
+
+.hero-nav{margin-top:clamp(28px,5vh,54px);display:flex;gap:clamp(10px,1.6vw,20px);
+  border-top:1px solid var(--rule);padding-top:16px}
+.hn{flex:1;min-width:0;background:none;border:0;padding:0;cursor:pointer;text-align:left;
+  font-family:var(--f-g);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-2);transition:color .35s}
+.hn.on{color:var(--ink)}
+.hn-bar{display:block;height:2px;background:var(--rule);margin-bottom:10px;
+  position:relative;overflow:hidden}
+.hn-bar i{position:absolute;inset:0 auto 0 0;width:0;background:var(--green)}
+.hn-label{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.hero-plate{position:relative;overflow:hidden;background:var(--paper-2);
+  border-left:1px solid var(--rule)}
+/* 판형 전환 — 들어오는 장면이 나가는 장면 '위로' 덮으며 밝아진다.
+   둘이 동시에 반투명해지는 구간이 없어 판형 바탕이 비쳐 보이지 않는다. */
+.hs-media{position:absolute;inset:0;z-index:1;opacity:0;
+  transition:opacity 1.05s var(--ease)}
+.hs-media.on{opacity:1;z-index:2}
+.hs-media img,.hs-media video,.hs-media svg{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.075);transform-origin:52% 46%}
+/* 사진은 채도만 낮춰 페이퍼에 붙인다 — 색을 더하지 않는다 */
+.hs-media img,.hs-media video{filter:saturate(.66) contrast(1.05) brightness(.99)}
+/* 머무는 동안 아주 천천히 밀려 들어온다 — 정지 화면으로 굳지 않게 */
+.hs-media.on img,.hs-media.on video,.hs-media.on svg{
+  animation:plateDrift 7.4s cubic-bezier(.18,.7,.3,1) forwards}
+@keyframes plateDrift{from{transform:scale(1.075)}to{transform:scale(1)}}
+
+/* 전환 순간 판형을 가로지르는 계측선 — 시안 3의 눈금 언어를 전환에도 쓴다 */
+.plate-sweep{position:absolute;top:0;bottom:0;left:0;width:1px;z-index:5;
+  background:rgba(255,255,255,.6);mix-blend-mode:difference;
+  opacity:0;pointer-events:none}
+.plate-sweep.run{animation:plateSweep 1.15s cubic-bezier(.4,0,.2,1)}
+@keyframes plateSweep{
+  0%{left:0;opacity:0}
+  12%{opacity:1}
+  88%{opacity:1}
+  100%{left:100%;opacity:0}
+}
+.plate-wash{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(200deg,rgba(244,246,243,.26) 0%,rgba(244,246,243,0) 46%,rgba(15,21,18,.24) 100%)}
+.plate-ticks{position:absolute;left:0;top:0;bottom:0;z-index:3;width:26px;
+  display:flex;flex-direction:column;justify-content:space-between;padding:26px 0;
+  pointer-events:none}
+/* 어두운 사진과 밝은 도면 판형 양쪽에서 읽혀야 한다 — 배경을 반전시켜 얹는다 */
+.plate-ticks span{display:block;height:1px;background:rgba(255,255,255,.55);
+  mix-blend-mode:difference}
+.plate-ticks span:nth-child(odd){width:16px}
+.plate-ticks span:nth-child(even){width:9px}
+.hero-caption{position:absolute;right:0;bottom:0;z-index:4;
+  font-family:var(--f-g);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--paper);background:rgba(15,21,18,.74);backdrop-filter:blur(6px);
+  padding:8px 14px}
+
+@media(max-width:900px){
+  .hero{padding-top:78px}
+  .hero-grid{grid-template-columns:1fr;grid-template-rows:38svh minmax(0,1fr)}
+  .hero-plate{border-left:0;border-bottom:1px solid var(--rule);order:-1}
+  .hero-copy{padding:clamp(24px,4vh,36px) var(--pad) clamp(24px,4vh,40px)}
+}
+@media(max-width:560px){.hn-label{display:none}.hn{flex:none;width:38px}}
+
+/* ========== PERFORMANCE ========== */
+.perf{position:relative;overflow:hidden}
+.perf .wrap{position:relative;z-index:2}
+.perf-plot{position:absolute;inset:auto 0 0 0;height:62%;z-index:0;pointer-events:none;
+  opacity:0;transition:opacity 1.2s var(--ease)}
+.perf.in-view .perf-plot{opacity:1}
+.perf-plot svg{width:100%;height:100%;display:block}
+.plot-grid{stroke:var(--ink);stroke-width:1;opacity:.07}
+.plot-fill{fill:url(#plotGrad);opacity:0}
+.perf.in-view .plot-fill{opacity:1;transition:opacity 1.6s .4s var(--ease)}
+/* 파트너 띠 위를 지나므로 글자를 방해하지 않을 만큼만 남긴다 */
+.plot-line{stroke:var(--green);stroke-width:1.4;fill:none;opacity:.3;stroke-linecap:round;
+  stroke-dasharray:2600;stroke-dashoffset:2600}
+.perf.in-view .plot-line{animation:plotDraw 3s .2s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes plotDraw{to{stroke-dashoffset:0}}
+
+.perf-nums{margin-top:clamp(36px,5.5vh,60px);display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--rule)}
+.pn{padding:26px clamp(12px,2.4vw,32px) 4px;border-right:1px solid var(--rule)}
+.pn:last-child{border-right:0}
+.pn:first-child{padding-left:0}
+.pn-val{font-family:var(--f-g);font-weight:300;font-size:clamp(38px,5.6vw,68px);
+  line-height:1;letter-spacing:-.045em;color:var(--ink);display:flex;align-items:baseline;
+  /* 세는 동안 자릿수 폭이 바뀌면 옆의 +·%·년 이 좌우로 떨린다 */
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+.pn-val sup{font-size:.42em;font-weight:400;color:var(--green);
+  margin-left:.12em;transform:translateY(-.1em);align-self:flex-start}
+.pn-unit{font-size:.4em;font-weight:400;margin-left:.12em;color:var(--ink-2)}
+.pn-label{margin-top:14px;font-size:13.5px;color:var(--ink-2);font-weight:300}
+@media(max-width:720px){
+  .perf-nums{grid-template-columns:1fr}
+  .pn{border-right:0;border-bottom:1px solid var(--rule);padding-left:0}
+  .pn:last-child{border-bottom:0}
+}
+
+/* partners — 글자만 흐르는 띠 */
+.partners{margin-top:clamp(40px,6vh,68px);border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);padding:6px 0}
+.p-row{overflow:hidden;padding:11px 0;
+  mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.p-row+.p-row{border-top:1px solid var(--rule)}
+.p-belt{display:flex;width:max-content;align-items:center}
+/* 1행은 좌 → 우, 2행은 그 반대로 흘려 서로 엇갈리게 한다.
+   목록을 두 벌 넣어 두었으므로 50%만 밀면 이음매 없이 순환한다. */
+.p-row:nth-child(1) .p-belt{animation:beltRight 42s linear infinite}
+.p-row:nth-child(2) .p-belt{animation:beltLeft 48s linear infinite}
+.p-row:hover .p-belt{animation-play-state:paused}
+@keyframes beltRight{from{transform:translate3d(-50%,0,0)}to{transform:translate3d(0,0,0)}}
+@keyframes beltLeft{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.p-item{flex:none;font-family:var(--f-g);font-size:15px;font-weight:400;
+  letter-spacing:.02em;color:var(--ink-2);padding:0 clamp(16px,2.4vw,30px);
+  display:flex;align-items:center;gap:clamp(16px,2.4vw,30px);transition:color .3s}
+.p-item:hover{color:var(--green)}
+.p-item::after{content:"";width:3px;height:3px;background:var(--rule);flex:none}
+
+/* ========== PRODUCTS ========== */
+.prod-tabs{margin-top:clamp(26px,3.6vh,40px);display:flex;gap:0;flex-wrap:wrap;
+  border-bottom:1px solid var(--rule)}
+.ptab{font-family:var(--f-kr);font-size:14.5px;font-weight:400;color:var(--ink-2);
+  background:none;border:0;border-bottom:2px solid transparent;
+  padding:12px clamp(14px,2vw,24px);cursor:pointer;margin-bottom:-1px;
+  transition:color .3s,border-color .3s}
+.ptab:hover{color:var(--ink)}
+.ptab.on{color:var(--ink);border-bottom-color:var(--green)}
+
+.prod-grid{margin-top:clamp(26px,4vh,44px);display:grid;grid-template-columns:repeat(4,1fr);
+  gap:clamp(14px,2vw,26px)}
+.pcard{display:block;position:relative;transition:transform .5s var(--ease)}
+.pcard:hover{transform:translateY(-6px)}
+.pcard-img{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--paper-2);
+  border:1px solid var(--rule)}
+.pcard-img img{width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(.68) contrast(1.04);
+  transition:transform .7s var(--ease),filter .5s var(--ease)}
+.pcard:hover .pcard-img img{transform:scale(1.06);filter:saturate(1) contrast(1.02)}
+.pcard-n{position:absolute;top:0;left:0;z-index:2;
+  font-family:var(--f-g);font-size:10.5px;letter-spacing:.16em;
+  color:var(--paper);background:var(--ink);padding:6px 10px}
+.pcard-info{padding-top:14px;display:flex;align-items:baseline;justify-content:space-between;
+  gap:10px;border-top:1px solid var(--rule);margin-top:14px}
+.pcard-name{font-family:var(--f-g);font-size:18px;font-weight:400;letter-spacing:-.02em}
+.pcard-sub{font-family:var(--f-g);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-2);white-space:nowrap}
+@media(max-width:900px){.prod-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.prod-grid{grid-template-columns:1fr;max-width:360px}}
+
+/* ========== CONTENTS ========== */
+.cont-pills{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}
+.cont-pill{font-family:var(--f-kr);font-size:13.5px;font-weight:400;padding:9px 18px;
+  border:1px solid var(--ink);color:var(--ink);background:none;cursor:pointer;
+  transition:background .3s var(--ease),color .3s,border-color .3s}
+.cont-pill:hover{background:var(--green);border-color:var(--green);color:var(--paper)}
+.cont-visual{margin-top:clamp(32px,5vh,60px);position:relative}
+/* 화살표는 썸네일 위에 얹지 않고 벨트 위 오른쪽에 세워 둔다 */
+.cont-ctrl{display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px}
+.slide-btn{width:44px;height:44px;background:var(--paper);border:1px solid var(--ink);
+  color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .3s var(--ease),color .3s,border-color .3s,opacity .3s}
+.slide-btn:hover{background:var(--green);border-color:var(--green);color:var(--paper)}
+.slide-btn:disabled{opacity:.26;cursor:not-allowed}
+.slide-btn:disabled:hover{background:var(--paper);border-color:var(--ink);color:var(--ink)}
+.slide-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.6;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.cont-visual-mask{overflow:hidden}
+.thumb-belt{display:flex;gap:clamp(14px,2vw,22px);
+  overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;scroll-snap-type:x mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px}
+.thumb-belt::-webkit-scrollbar{display:none}
+.thumb{scroll-snap-align:start;flex:none;width:clamp(238px,26vw,318px);display:block;
+  transition:transform .45s var(--ease)}
+.thumb:hover{transform:translateY(-6px)}
+.thumb-bg{position:relative;aspect-ratio:16/10;overflow:hidden;border:1px solid var(--rule);
+  background:var(--paper-2)}
+.thumb-bg img{width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(.72) contrast(1.04);transition:filter .5s var(--ease)}
+.thumb:hover .thumb-bg img{filter:none}
+.thumb-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:52px;height:52px;border-radius:50%;background:rgba(244,246,243,.92);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .3s,transform .35s var(--ease)}
+.thumb-play::after{content:"";width:0;height:0;margin-left:4px;
+  border-left:13px solid var(--ink);border-top:8.5px solid transparent;border-bottom:8.5px solid transparent;
+  transition:border-left-color .3s}
+.thumb:hover .thumb-play{background:var(--green);transform:translate(-50%,-50%) scale(1.08)}
+.thumb:hover .thumb-play::after{border-left-color:var(--paper)}
+.thumb-info{padding-top:12px;margin-top:12px;border-top:1px solid var(--rule);
+  display:flex;align-items:center;gap:8px}
+.thumb-ch{font-family:var(--f-g);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--green)}
+.thumb-title{font-size:13.5px;color:var(--ink-2);font-weight:300;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+
+/* ========== BOTTOM CTA ========== */
+.bcta{scroll-snap-stop:normal;text-align:left}
+.bcta-title{font-family:var(--f-g);font-weight:300;font-size:clamp(34px,5.4vw,70px);
+  line-height:1.14;letter-spacing:-.035em}
+.bcta-title em{font-style:normal;font-weight:500;color:var(--green)}
+.bcta-cards{margin-top:clamp(30px,4.6vh,52px);display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--rule)}
+.bcta-card{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:24px clamp(12px,2vw,26px);border-right:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  font-size:15px;color:var(--ink);transition:color .35s var(--ease)}
+.bcta-card:first-child{padding-left:0}
+.bcta-card:last-child{border-right:0}
+.bcta-card svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.6;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex:none;transition:transform .35s var(--ease)}
+.bcta-card:hover{color:var(--green)}
+.bcta-card:hover svg{transform:translateX(4px)}
+.bcta-btn{margin-top:clamp(30px,4.6vh,50px);display:inline-flex;align-items:center;gap:12px;
+  font-family:var(--f-g);font-size:15px;font-weight:500;letter-spacing:.03em;
+  color:var(--paper);background:var(--ink);padding:17px 38px;border:0;cursor:pointer;
+  transition:background .3s var(--ease),transform .3s var(--ease)}
+.bcta-btn:hover{background:var(--green);transform:translateY(-2px)}
+.bcta-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:720px){
+  .bcta-cards{grid-template-columns:1fr}
+  .bcta-card{border-right:0;padding-left:0}
+}
+
+/* ========== FOOTER ========== */
+.foot{padding:clamp(38px,6vh,60px) var(--pad);border-top:1px solid var(--rule);
+  scroll-snap-align:end;background:var(--paper-2)}
+.foot-in{display:flex;justify-content:space-between;align-items:flex-end;
+  flex-wrap:wrap;gap:22px}
+.foot-brand{display:flex;align-items:center;gap:10px}
+.foot-brand svg{height:20px;fill:var(--ink)}
+.foot-brand b{font-family:var(--f-g);font-weight:600;font-size:15px;letter-spacing:.06em}
+.foot-copy{margin-top:10px;font-family:var(--f-g);font-size:11.5px;letter-spacing:.06em;
+  color:var(--ink-2)}
+.foot-links{display:flex;gap:22px;font-size:13px;color:var(--ink-2);flex-wrap:wrap}
+.foot-links a{transition:color .3s}.foot-links a:hover{color:var(--green)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+  .rv{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGO SYMBOL -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="abx" viewBox="0 0 1530 611">
+    <path d="M304 0 H609 L618 150 L765 0 H1069 L1078 150 L1227 0 H1528
+             L1530 305 L1224 611 H922 L913 461 L763 611 H461 L455 461
+             L304 611 H3 L0 307 Z"/>
+  </symbol>
+</svg>
+
+<!-- 우측 섹션 네비 -->
+<nav class="sec-nav" id="secNav" aria-label="섹션 이동">
+  <a href="#hero" class="sn-item" data-target="hero"><span class="sn-label">Home</span><span class="sn-n">01</span><span class="sn-tick"></span></a>
+  <a href="#perf" class="sn-item" data-target="perf"><span class="sn-label">Performance</span><span class="sn-n">02</span><span class="sn-tick"></span></a>
+  <a href="#products" class="sn-item" data-target="products"><span class="sn-label">Products</span><span class="sn-n">03</span><span class="sn-tick"></span></a>
+  <a href="#contents" class="sn-item" data-target="contents"><span class="sn-label">Contents</span><span class="sn-n">04</span><span class="sn-tick"></span></a>
+  <a href="#cta" class="sn-item" data-target="cta"><span class="sn-label">Contact</span><span class="sn-n">05</span><span class="sn-tick"></span></a>
+</nav>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#hero" class="logo"><svg viewBox="0 0 1530 611"><use href="#abx"/></svg><b>AIBOX</b></a>
+
+  <div class="nav-panel" id="navPanel">
+    <div class="nav-mid">
+      <a href="#">회사소개</a>
+      <a href="#">사업영역</a>
+      <a href="#">제품정보</a>
+      <a href="#">고객소통</a>
+    </div>
+    <div class="nav-right">
+      <button class="lang-pill">KOR</button>
+      <a href="#cta" class="nav-cta">문의하기
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+
+  <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기"
+          aria-expanded="false" aria-controls="navPanel">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero snap" id="hero">
+  <div class="hero-grid">
+
+    <div class="hero-copy">
+      <div class="hero-stack">
+        <!-- 제목은 줄 단위로 감싼다 — 슬라이드마다 다른 몸짓을 줄에 걸기 위해 -->
+        <div class="hs-text on" data-i="0">
+          <div class="hero-label">AIBOX</div>
+          <h1 class="hero-h">
+            <span class="ln">더 좋은 열매를 위한</span>
+            <span class="ln"><em>가장 똑똑한 기술</em></span>
+          </h1>
+          <p class="hero-sub">나노소재와 AI 기술로 농업의 재료를 다시 만듭니다.</p>
+        </div>
+        <div class="hs-text" data-i="1">
+          <div class="hero-label">Beyond Agriculture</div>
+          <h1 class="hero-h">
+            <span class="ln">농업 그 너머,</span>
+            <span class="ln"><em>미래로</em></span>
+          </h1>
+          <p class="hero-sub">흙과 비료, 농약에 기대어 온 농업을 나노·바이오 소재로 다시 씁니다.</p>
+        </div>
+        <div class="hs-text" data-i="2">
+          <div class="hero-label">Less Input, More Yield</div>
+          <h1 class="hero-h">
+            <span class="ln">덜 넣고,</span>
+            <span class="ln"><em>더 거둡니다</em></span>
+          </h1>
+          <p class="hero-sub">비료와 농약은 절반으로. 수확량과 품질은 그 이상으로.</p>
+        </div>
+        <div class="hs-text" data-i="3">
+          <div class="hero-label">AI + Data</div>
+          <h1 class="hero-h">
+            <span class="ln">20년의 데이터가</span>
+            <span class="ln"><em>재배를 판단합니다</em></span>
+          </h1>
+          <p class="hero-sub">식물생리 데이터 기반 처방으로 숙련도에 기대지 않는 농업을 만듭니다.</p>
+        </div>
+      </div>
+
+      <div class="hero-nav" id="heroNav">
+        <button class="hn" data-go="0"><span class="hn-bar"><i></i></span><span class="hn-label">01 비전</span></button>
+        <button class="hn" data-go="1"><span class="hn-bar"><i></i></span><span class="hn-label">02 기술</span></button>
+        <button class="hn" data-go="2"><span class="hn-bar"><i></i></span><span class="hn-label">03 결과</span></button>
+        <button class="hn" data-go="3"><span class="hn-bar"><i></i></span><span class="hn-label">04 데이터</span></button>
+      </div>
+    </div>
+
+    <div class="hero-plate">
+      <div class="hs-media on" data-i="0">
+        <video muted loop playsinline preload="auto" autoplay
+               poster="assets/hero-1-poster.jpg" src="assets/hero-1.mp4"></video>
+      </div>
+      <div class="hs-media" data-i="1">
+        <video muted loop playsinline preload="auto"
+               poster="assets/hero-2-poster.jpg" src="assets/hero-2.mp4"></video>
+      </div>
+      <div class="hs-media" data-i="2">
+        <img src="assets/hydroponic.jpg" alt="수경재배 현장" loading="lazy">
+      </div>
+      <!-- 04는 사진 대신 계측 도면 — '데이터가 판단한다'를 그대로 그린다 -->
+      <div class="hs-media" data-i="3">
+        <svg viewBox="0 0 700 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="700" height="900" fill="#E9ECE7"/>
+          <g stroke="#0F1512" stroke-width="1" opacity=".08">
+            <path d="M0 150H700M0 300H700M0 450H700M0 600H700M0 750H700"/>
+            <path d="M100 0V900M240 0V900M380 0V900M520 0V900M660 0V900"/>
+          </g>
+          <path d="M40 700 C150 660 190 560 280 520 C370 480 420 520 500 450 C570 390 620 300 670 250"
+                stroke="#1B6E3C" stroke-width="2" fill="none" opacity=".85" stroke-linecap="round"/>
+          <path d="M40 780 C150 760 200 700 300 660 C400 620 470 600 560 540 C620 500 650 460 670 430"
+                stroke="#5B8C6C" stroke-width="1.6" fill="none" opacity=".7"
+                stroke-dasharray="6 8" stroke-linecap="round"/>
+          <g fill="#1B6E3C">
+            <circle cx="280" cy="520" r="5"/><circle cx="500" cy="450" r="5"/><circle cx="670" cy="250" r="6"/>
+          </g>
+          <g stroke="#0F1512" stroke-width="1" opacity=".35">
+            <path d="M280 520 v40 M500 450 v40 M670 250 v40"/>
+          </g>
+          <g fill="#0F1512" opacity=".5" font-family="Space Grotesk, sans-serif" font-size="15" letter-spacing="2">
+            <text x="262" y="586">T1</text><text x="482" y="516">T2</text><text x="648" y="316">T3</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="plate-wash"></div>
+      <span class="plate-sweep" id="plateSweep" aria-hidden="true"></span>
+      <div class="plate-ticks" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="hero-caption" id="heroCaption">Fig. 01 — Vision</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section class="sec perf snap" id="perf">
+  <div class="perf-plot" aria-hidden="true">
+    <svg viewBox="0 0 1400 500" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="plotGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1B6E3C" stop-opacity=".09"/>
+          <stop offset="1" stop-color="#1B6E3C" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g class="plot-grid"><path d="M0 120H1400M0 240H1400M0 360H1400"/></g>
+      <path class="plot-fill" d="M0 430 C160 410 250 350 400 306 C520 272 620 306 720 306 C820 306 900 272 1000 224 C1140 158 1260 102 1400 62 L1400 500 L0 500 Z"/>
+      <path class="plot-line" d="M0 430 C160 410 250 350 400 306 C520 272 620 306 720 306 C820 306 900 272 1000 224 C1140 158 1260 102 1400 62"/>
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="rail rv">
+        <div class="num">02</div>
+        <div class="kicker">Performance</div>
+      </div>
+      <div>
+        <h2 class="h-sec rv rv-d1">현장에서 쌓인 기록이<br><em>기술의 근거</em>가 됩니다</h2>
+        <p class="lede rv rv-d2">에이아이박스는 더 완벽한 결실을 위해, 최신 AI 기술을 도입하여
+          농업의 미래를 그리고 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="perf-nums rv rv-d2">
+      <div class="pn">
+        <div class="pn-val"><span class="cnt" data-to="3000">0</span><sup>+</sup></div>
+        <div class="pn-label">누적 컨설팅 농가</div>
+      </div>
+      <div class="pn">
+        <div class="pn-val"><span class="cnt" data-to="130">0</span><span class="pn-unit">%</span></div>
+        <div class="pn-label">연평균 성장률</div>
+      </div>
+      <div class="pn">
+        <div class="pn-val"><span class="cnt" data-to="20">0</span><span class="pn-unit">년+</span></div>
+        <div class="pn-label">대표 현장 경력</div>
+      </div>
+    </div>
+
+    <div class="partners rv rv-d3">
+      <div class="p-row"><div class="p-belt">
+        <span class="p-item">농협</span><span class="p-item">Post AI</span><span class="p-item">Quantum Nature</span><span class="p-item">고령군</span><span class="p-item">HKCHEM</span><span class="p-item">고려대학교</span><span class="p-item">Fire Crew</span><span class="p-item">농협</span><span class="p-item">Post AI</span><span class="p-item">Quantum Nature</span><span class="p-item">고령군</span><span class="p-item">HKCHEM</span><span class="p-item">고려대학교</span><span class="p-item">Fire Crew</span>
+      </div></div>
+      <div class="p-row"><div class="p-belt">
+        <span class="p-item">성주군</span><span class="p-item">T-CHEM</span><span class="p-item">DOBICO</span><span class="p-item">경북대학교</span><span class="p-item">한국화학연구원</span><span class="p-item">KOALA</span><span class="p-item">NANO CHEM</span><span class="p-item">성주군</span><span class="p-item">T-CHEM</span><span class="p-item">DOBICO</span><span class="p-item">경북대학교</span><span class="p-item">한국화학연구원</span><span class="p-item">KOALA</span><span class="p-item">NANO CHEM</span>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="sec sec--alt products snap" id="products">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="rail rv">
+        <div class="num">03</div>
+        <div class="kicker">Products</div>
+      </div>
+      <div>
+        <h2 class="h-sec rv rv-d1">재배의 방식을<br><em>다시 설계</em>합니다</h2>
+        <p class="lede rv rv-d2">에이아이박스는 더 완벽한 결실을 위해, 최신 AI 기술을 도입하여
+          농업의 미래를 그리고 있습니다.</p>
+
+        <div class="prod-tabs rv rv-d2">
+          <button class="ptab on">스마트팜</button>
+          <button class="ptab">재배솔루션</button>
+          <button class="ptab">농자재</button>
+          <button class="ptab">과일유통</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="prod-grid rv rv-d3">
+      <a class="pcard" href="#">
+        <div class="pcard-img">
+          <span class="pcard-n">01</span>
+          <img src="assets/greenhouse.jpg" alt="식물공장" loading="lazy">
+        </div>
+        <div class="pcard-info">
+          <span class="pcard-name">식물공장</span><span class="pcard-sub">Vertical Farm</span>
+        </div>
+      </a>
+      <a class="pcard" href="#">
+        <div class="pcard-img">
+          <span class="pcard-n">02</span>
+          <img src="assets/vertical-farm.jpg" alt="온실 스마트팜" loading="lazy">
+        </div>
+        <div class="pcard-info">
+          <span class="pcard-name">온실 스마트팜</span><span class="pcard-sub">Greenhouse</span>
+        </div>
+      </a>
+      <a class="pcard" href="#">
+        <div class="pcard-img">
+          <span class="pcard-n">03</span>
+          <img src="assets/hydroponic.jpg" alt="수경재배" loading="lazy">
+        </div>
+        <div class="pcard-info">
+          <span class="pcard-name">수경재배</span><span class="pcard-sub">Hydroponics</span>
+        </div>
+      </a>
+      <a class="pcard" href="#">
+        <div class="pcard-img">
+          <span class="pcard-n">04</span>
+          <img src="assets/container.jpg" alt="컨테이너팜" loading="lazy"
+               style="object-position:left center">
+        </div>
+        <div class="pcard-info">
+          <span class="pcard-name">컨테이너팜</span><span class="pcard-sub">Container Farm</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENTS -->
+<section class="sec contents snap" id="contents">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="rail rv">
+        <div class="num">04</div>
+        <div class="kicker">Contents</div>
+      </div>
+      <div>
+        <h2 class="h-sec rv rv-d1">현장의 이야기를<br><em>기록</em>합니다</h2>
+        <p class="lede rv rv-d2">에이아이박스는 더 완벽한 결실을 위해, 최신 AI 기술을 도입하여
+          농업의 미래를 그리고 있습니다.</p>
+        <div class="cont-pills rv rv-d2">
+          <button class="cont-pill">AI농업</button>
+          <button class="cont-pill">스마트팜</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cont-visual rv rv-d3">
+      <div class="cont-ctrl">
+        <button class="slide-btn" id="thumbPrev" aria-label="이전 영상">
+          <svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg>
+        </button>
+        <button class="slide-btn" id="thumbNext" aria-label="다음 영상">
+          <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </button>
+      </div>
+      <div class="cont-visual-mask">
+        <div class="thumb-belt" id="thumbBelt">
+          <a class="thumb" href="https://www.youtube.com/watch?v=OOiPUtX3tw0" target="_blank" rel="noopener">
+            <div class="thumb-bg">
+              <img src="https://i.ytimg.com/vi/OOiPUtX3tw0/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy">
+              <span class="thumb-play"></span>
+            </div>
+            <div class="thumb-info"><span class="thumb-ch">농사천국</span><span class="thumb-title">현장 재배 기록</span></div>
+          </a>
+          <a class="thumb" href="https://www.youtube.com/watch?v=h_5QVik9B3A" target="_blank" rel="noopener">
+            <div class="thumb-bg">
+              <img src="https://i.ytimg.com/vi/h_5QVik9B3A/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy">
+              <span class="thumb-play"></span>
+            </div>
+            <div class="thumb-info"><span class="thumb-ch">농사천국</span><span class="thumb-title">토양과 뿌리</span></div>
+          </a>
+          <a class="thumb" href="https://www.youtube.com/watch?v=1Wnf01hb-N8" target="_blank" rel="noopener">
+            <div class="thumb-bg">
+              <img src="https://i.ytimg.com/vi/1Wnf01hb-N8/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy">
+              <span class="thumb-play"></span>
+            </div>
+            <div class="thumb-info"><span class="thumb-ch">농사천국</span><span class="thumb-title">수확기 관찰</span></div>
+          </a>
+          <a class="thumb" href="https://www.youtube.com/watch?v=aSybmY-L0ik" target="_blank" rel="noopener">
+            <div class="thumb-bg">
+              <img src="https://i.ytimg.com/vi/aSybmY-L0ik/hqdefault.jpg" alt="농사천국 유튜브 영상" loading="lazy">
+              <span class="thumb-play"></span>
+            </div>
+            <div class="thumb-info"><span class="thumb-ch">농사천국</span><span class="thumb-title">처방 사례</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="sec sec--alt bcta snap" id="cta">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="rail rv">
+        <div class="num">05</div>
+        <div class="kicker">Contact</div>
+      </div>
+      <div>
+        <h2 class="bcta-title rv rv-d1">함께 만들<br><em>다음 수확</em>을 이야기합니다</h2>
+        <p class="lede rv rv-d2">에이아이박스는 더 완벽한 결실을 위해, 최신 AI 기술을 도입하여
+          농업의 미래를 그리고 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="bcta-cards rv rv-d2">
+      <a class="bcta-card" href="#">투자 문의
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="bcta-card" href="#">사업 협력
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="bcta-card" href="#">채용 공고
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+
+    <button class="bcta-btn rv rv-d3">문의하기
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div>
+      <div class="foot-brand"><svg viewBox="0 0 1530 611"><use href="#abx"/></svg><b>AIBOX</b></div>
+      <div class="foot-copy">© 2026 AIBOX. All rights reserved.</div>
+    </div>
+    <div class="foot-links">
+      <a href="#">회사소개</a><a href="#">사업영역</a><a href="#">제품정보</a><a href="#">개인정보처리방침</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* reveal */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }});
+  }, {threshold:.15, rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  var nav = document.getElementById('nav');
+  window.addEventListener('scroll', function(){
+    if(nav) nav.classList.toggle('stuck', window.scrollY > 40);
+  }, {passive:true});
+
+  /* 모바일 햄버거 — 메뉴·언어·CTA가 전부 이 안으로 들어간다 */
+  (function(){
+    var toggle = document.getElementById('navToggle');
+    var panel  = document.getElementById('navPanel');
+    if(!toggle || !panel || !nav) return;
+
+    function setOpen(open){
+      nav.classList.toggle('menu-open', open);
+      document.body.classList.toggle('nav-locked', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    }
+    toggle.addEventListener('click', function(){
+      setOpen(!nav.classList.contains('menu-open'));
+    });
+    /* 드로어 안의 링크를 누르면 닫고 이동한다 */
+    panel.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){ setOpen(false); });
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && nav.classList.contains('menu-open')) setOpen(false);
+    });
+    /* 데스크톱으로 넓어지면 드로어 상태를 흘려보내지 않는다.
+       addEventListener는 Safari 14부터 — 그 아래는 addListener로 받는다. */
+    var mq = matchMedia('(min-width:981px)');
+    function onWide(e){ if(e.matches) setOpen(false); }
+    if(mq.addEventListener) mq.addEventListener('change', onWide);
+    else if(mq.addListener) mq.addListener(onWide);
+  })();
+
+  /* hero — 텍스트와 판형이 따로 페이드. 순서·자동재생 규칙은 시안 2와 동일 */
+  (function(){
+    var texts  = [].slice.call(document.querySelectorAll('.hs-text'));
+    var medias = [].slice.call(document.querySelectorAll('.hs-media'));
+    var btns   = [].slice.call(document.querySelectorAll('.hn'));
+    var cap    = document.getElementById('heroCaption');
+    var sweep  = document.getElementById('plateSweep');
+    if(!texts.length) return;
+
+    var CAPS = ['Fig. 01 — Vision','Fig. 02 — Technology','Fig. 03 — Yield','Fig. 04 — Data'];
+    var DUR = 5600, idx = 0, timer = null, first = true;
+
+    function go(i){
+      idx = i;
+      texts.forEach(function(t,n){ t.classList.toggle('on', n===i); });
+      /* 계측선은 '전환'의 신호다 — 첫 진입에는 긋지 않는다 */
+      if(sweep && !reduce && !first){
+        sweep.classList.remove('run');
+        void sweep.offsetWidth;   /* 같은 애니메이션을 다시 돌리려면 리플로가 필요하다 */
+        sweep.classList.add('run');
+      }
+      first = false;
+      medias.forEach(function(m,n){
+        m.classList.toggle('on', n===i);
+        var v = m.querySelector('video');
+        if(v){
+          if(n===i){ var pr = v.play(); if(pr && pr.catch) pr.catch(function(){}); }
+          else v.pause();
+        }
+      });
+      if(cap) cap.textContent = CAPS[i] || '';
+      btns.forEach(function(b,n){
+        b.classList.toggle('on', n===i);
+        var bar = b.querySelector('i');
+        bar.style.transition = 'none';
+        bar.style.width = '0%';
+        if(n===i && !reduce){
+          void bar.offsetWidth;
+          bar.style.transition = 'width ' + DUR + 'ms linear';
+          bar.style.width = '100%';
+        } else if(n===i){ bar.style.width = '100%'; }
+      });
+    }
+    function next(){ go((idx+1) % texts.length); }
+    function play(){ clearInterval(timer); timer = setInterval(next, DUR); }
+
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){ go(+b.dataset.go); play(); });
+    });
+    document.addEventListener('visibilitychange', function(){
+      if(document.hidden) clearInterval(timer); else play();
+    });
+    go(0); play();
+  })();
+
+  /* tabs */
+  document.querySelectorAll('.ptab').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.ptab').forEach(function(t){ t.classList.remove('on'); });
+      b.classList.add('on');
+    });
+  });
+
+  /* 숫자 카운팅 — 화면에 들어오면 0에서 목표까지 센다.
+     셋이 동시에 끝나면 뭉쳐 보이므로 조금씩 시차를 준다. */
+  var cio = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target, to = +el.dataset.to, wait = +el.dataset.delay || 0, dur = 1600;
+      cio.unobserve(el);
+      if(reduce){ el.textContent = to.toLocaleString(); return; }
+      var t0 = null;
+      function step(t){
+        if(t0 === null) t0 = t;
+        var el_ = t - t0 - wait;
+        if(el_ < 0){ requestAnimationFrame(step); return; }
+        var p = Math.min(el_/dur, 1);
+        /* ease-out cubic — 초반에 빠르게 올라가고 끝에서 멎는다 */
+        el.textContent = Math.round(to * (1 - Math.pow(1-p,3))).toLocaleString();
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, {threshold:.6});
+  document.querySelectorAll('.cnt').forEach(function(el,i){
+    el.dataset.delay = i * 150;
+    cio.observe(el);
+  });
+
+  /* 유튜브 썸네일 슬라이더 */
+  (function(){
+    var belt = document.getElementById('thumbBelt');
+    var prev = document.getElementById('thumbPrev');
+    var next = document.getElementById('thumbNext');
+    if(!belt || !prev || !next) return;
+    function step(){
+      var card = belt.querySelector('.thumb');
+      if(!card) return 300;
+      var s = getComputedStyle(belt);
+      var gap = parseFloat(s.columnGap || s.gap || 20);
+      return card.getBoundingClientRect().width + gap;
+    }
+    function update(){
+      var max = belt.scrollWidth - belt.clientWidth - 2;
+      prev.disabled = belt.scrollLeft <= 2;
+      next.disabled = belt.scrollLeft >= max;
+    }
+    prev.addEventListener('click', function(){ belt.scrollBy({left:-step(),behavior:'smooth'}); });
+    next.addEventListener('click', function(){ belt.scrollBy({left: step(),behavior:'smooth'}); });
+    belt.addEventListener('scroll', update, {passive:true});
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  /* 우측 섹션 네비 */
+  (function(){
+    var sn = document.getElementById('secNav');
+    if(!sn) return;
+    var items = [].slice.call(sn.querySelectorAll('.sn-item'));
+    var map = {};
+    items.forEach(function(a){
+      var sec = document.getElementById(a.dataset.target);
+      if(sec) map[a.dataset.target] = sec;
+    });
+    setTimeout(function(){ sn.classList.add('ready'); }, 400);
+
+    function pick(){
+      var mid = window.innerHeight/2, best = null, bestDist = Infinity;
+      for(var id in map){
+        var r = map[id].getBoundingClientRect();
+        var d = Math.abs((r.top + r.bottom)/2 - mid);
+        if(d < bestDist){ bestDist = d; best = id; }
+      }
+      items.forEach(function(a){ a.classList.toggle('on', a.dataset.target === best); });
+    }
+    window.addEventListener('scroll', pick, {passive:true});
+    window.addEventListener('resize', pick);
+    pick();
+  })();
+
+  /* perf 플롯 트리거 */
+  var perfSec = document.getElementById('perf');
+  if(perfSec){
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){ perfSec.classList.toggle('in-view', e.isIntersecting); });
+    }, {threshold:.35}).observe(perfSec);
+  }
+})();
+</script>
+</body>
+</html>

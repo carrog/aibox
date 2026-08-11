@@ -7,6 +7,8 @@ AIBOX 홈페이지 리뉴얼을 위한 디자인 시안 저장소입니다.
 - **시안 1** (`/draft-1/`) — 다크 톤 · 산화철 앰버 · 스크롤 스크럽 애니메이션
 - **시안 2 Black** (`/draft-2-black/`) — 블랙 베이스 · 네온 그린 · 섹션 스냅 스크롤
 - **시안 2 White** (`/draft-2-white/`) — 라이트 반전 버전
+- **시안 3** (`/draft-3/`) — 오프화이트 · 딥 포레스트 그린 · 얇은 고딕 · 헤어라인 편집 격자.
+  섹션 순서와 흐름(4슬라이드 히어로 → Performance → Products → Contents → CTA)은 시안 2와 동일
 - **회사소개** (`/about.html`) — 원페이지 서브 페이지
 
 ## 로컬 실행
@@ -39,7 +41,10 @@ python3 -m http.server 8000
 ├── draft-2-black/
 │   ├── index.html
 │   └── assets/
-└── draft-2-white/
+├── draft-2-white/
+│   ├── index.html
+│   └── assets/
+└── draft-3/
     ├── index.html
     └── assets/
 ```
